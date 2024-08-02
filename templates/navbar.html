@@ -6,7 +6,15 @@
         </a>
 
         <nav class="header__menu">
+            {% if request.user.is_authenticated %}
+            <div class="header__user">
 
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}">
+                <p>Login</p>
+            </a>
+            {% endif %}
         </nav>
     </div>
 </header>
