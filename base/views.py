@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+from .forms import UserForm
+
 def home(request):
     return render(request, "base/home.html")
 
@@ -52,6 +54,18 @@ def registerPage(request):
     
     context = {"form": form}
     return render(request, "base/login_register.html", context)
+
+def updateUser(request):
+    user = request.user
+    form = UserForm(request.POST, instance=user)
+
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("user-profile", pk=user.id)
+    
+    return render(request, "base/update-user.html", {"form": form})
 
 # TODO: come back to this after handling login/registration
 def chat(request):
