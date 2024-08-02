@@ -2,6 +2,33 @@
 
 {% block content %}
 <div class="home-container">
-    <h1>AAAAAAAAAA!!!!!</h1>
+    <p>
+        In today's fast-paced world, finding someone to talk to about life's challenges and goals can be difficult. 
+        Our platform offers a unique solution: an AI-based friend and life coach that is available 24/7. 
+        This intelligent companion can provide advice, encouragement, and a listening ear, helping you navigate 
+        through personal and professional challenges. Whether you're looking for someone to help you set and achieve 
+        goals, or just need a friendly conversation, our AI is here to assist you every step of the way.
+    </p>
+    <p>
+        Our AI friend and life coach is designed to understand and respond to your needs with empathy and insight. 
+        Utilizing advanced language processing, the AI can converse naturally, offering guidance on a wide range of 
+        topics, from career advice to personal development. It learns from your interactions, tailoring its responses 
+        to better suit your personality and preferences. Join us today and experience a new way of receiving 
+        personalized support and companionship.
+    </p>
+
+    {% if request.user.is_authenticated %}
+    <form method="post" action="{% url 'chat' %}">
+        {% csrf_token %}
+
+        <button type="submit">Go to the Office</button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <button type="submit">Login or Register</button>
+    </form>
+    {% endif %}
 </div>
 {% endblock %}
