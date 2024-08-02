@@ -23,6 +23,7 @@ def loginPage(request):
         except:
             messages.error(request, "User does not exist.")
 
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect("home")
@@ -40,6 +41,7 @@ def registerPage(request):
     form = UserCreationForm()
 
     if request.method == "POST":
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
