@@ -1,4 +1,5 @@
 {% extends "main.html" %}
+{% load static %}
 
 {% block content %}
 <div id="chat-container">
@@ -13,4 +14,19 @@
         {% endif %}
     {% endfor %}
 </div>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="message" placeholder="Type your message here...">
+    <button type="submit" value="Send" id="send-btn">Send</button>
+</form>
+
+<script>
+    // Define global variables
+    // TODO: double-check that this is an okay thing to do. Feels sloppy :/
+    window.computerName = "Veronica";
+    window.userName = "{{ request.user.username }}";
+    window.sourceName = "chat";
+</script>
+<script src="{% static 'dynamic_refresh.js' %}"></script>
 {% endblock %}

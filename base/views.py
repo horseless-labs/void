@@ -72,7 +72,11 @@ def updateUser(request):
 
 # TODO: come back to this after handling login/registration
 def chat(request):
+    username = request.user
     chat_id = chat_session.generate_chat_id()
     base_messages = chat_session.initialize_chat_session()
-    context = {"chat_id": chat_id, "base_messages": base_messages}
+    context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
+
+    if request.method == "POST":
+        return render(request, "base/chat.html", context=context)
     return render(request, "base/chat.html", context=context)
