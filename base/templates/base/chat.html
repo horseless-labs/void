@@ -1,5 +1,16 @@
 {% extends "main.html" %}
 
 {% block content %}
-
+<div id="chat-container">
+    <div>Chat ID: {{ chat_id }}</div>
+    {% for message in base_messages %}
+        {% if not forloop.first %}
+            {% if message.role == "user" %}
+                <div class="message-user">{{ request.user.username }}: {{ message.content }}</div>
+            {% else %}
+                <div class="message-computer">Veronica: {{ message.content }}</div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
 {% endblock %}

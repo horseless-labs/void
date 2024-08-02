@@ -8,6 +8,8 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .forms import UserForm
 
+from .services import chat_session
+
 def home(request):
     return render(request, "base/home.html")
 
@@ -55,6 +57,7 @@ def registerPage(request):
     context = {"form": form}
     return render(request, "base/login_register.html", context)
 
+# TODO: test this later, as it is currently unconnected to anything.
 def updateUser(request):
     user = request.user
     form = UserForm(request.POST, instance=user)
@@ -69,4 +72,7 @@ def updateUser(request):
 
 # TODO: come back to this after handling login/registration
 def chat(request):
-    pass
+    chat_id = chat_session.generate_chat_id()
+    base_messages = chat_session.initialize_chat_session()
+    context = {"chat_id": chat_id, "base_messages": base_messages}
+    return render(request, "base/chat.html", context=context)
