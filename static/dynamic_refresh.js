@@ -3,6 +3,7 @@
 var computerName = window.computerName;
 var userName = window.userName;
 var sourceName = window.sourceName;
+var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 console.log(`The sourceName is ${sourceName}`)
 console.log(`The user is ${userName}`);
 
@@ -21,21 +22,22 @@ submitButton.addEventListener("click", (event) => {
     console.log(message)
     console.log("Form submitted");
 
-    fetch(`/${sourceName}_send_message`, {
+    fetch(`/${sourceName}-send-message/`, {
         method: "POST",
         body: JSON.stringify({ content: message }),
-        headers: { "Content-Type": "application/json"},
+        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
     })
     .then((response) => response.json())
     .then((data) => {
+        console.log(data);
         // Could be neater, but whatever. 
         const messageElement = document.createElement("div");
-        messageElement.className = data[0].role === "user" ? "message user" : "message computer";
-        messageElement.innerText = `${data[0].role === "user" ? userName + ": " : computerName + ": " }${data[0].content}`;
+        messageElement.className = data.role === "user" ? "message-user" : "message-computer";
+        messageElement.innerText = `${data.role === "user" ? userName + ": " : computerName + ": "}${data.content}`;
         chatContainer.appendChild(messageElement);
-    })
+    })    
     .then(() => {
-        return fetch(`/${sourceName}_send_response`, {
+        return fetch(`/${sourceName}-send-response/`, {
             method: "POST",
             body: JSON.stringify({ content: message }),
             headers: { "Content-Type": "application/json"},
@@ -46,7 +48,7 @@ submitButton.addEventListener("click", (event) => {
     })
     .then ((data) => {
         const messageElement = document.createElement("div");
-        messageElement.className = data[0].role === "user" ? "message user" : "message computer";
+        messageElement.className = data[0].role === "user" ? "message-user" : "message-computer";
         messageElement.innerText = `${data[0].role === "user" ? userName + ": " : computerName + ": "}${data[0].content}`;
         chatContainer.appendChild(messageElement);
     })
@@ -54,6 +56,6 @@ submitButton.addEventListener("click", (event) => {
         console.error(error)
     })
 
-    // CLear the input field
+    // Clear the input field
     inputBox.value = ''
 });

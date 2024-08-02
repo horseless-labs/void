@@ -1,3 +1,6 @@
+from datetime import datetime
+import json
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -6,9 +9,16 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-from .forms import UserForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now
 
+from .forms import UserForm
 from .services import chat_session
+
+# TODO: UGLY, FIX THIS LATER!!!
+base_messages = chat_session.initialize_chat_session()
+chat_id = chat_session.generate_chat_id()
 
 def home(request):
     return render(request, "base/home.html")
@@ -72,11 +82,28 @@ def updateUser(request):
 
 # TODO: come back to this after handling login/registration
 def chat(request):
+    # TODO: implement real session management
     username = request.user
-    chat_id = chat_session.generate_chat_id()
-    base_messages = chat_session.initialize_chat_session()
     context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
 
     if request.method == "POST":
-        return render(request, "base/chat.html", context=context)
+        # return render(request, "base/chat.html", context=context)
+        return JsonResponse(base_messages, safe=False)
     return render(request, "base/chat.html", context=context)
+
+@csrf_exempt
+def chatSendMessage(request):
+    if request.method == 'POST':
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        data = json.loads(request.body.decode('utf-8'))
+        user_message = data.get("content")
+        base_messages.append({"role": "user", "content": user_message})
+        return JsonResponse(base_messages[-1], safe=False)
+
+    return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+
+@csrf_exempt
+def chatSendResponse(request):
+    base_messages.append({"role": "assistant", "content": "Hell is empty, and all the devils are here."})
+    return JsonResponse(base_messages[-1:], safe=False)
