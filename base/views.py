@@ -13,8 +13,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now
 
+from django.http import HttpResponse
+
 from .forms import UserForm
 from .services import chat_session
+from .models import person_collection
 
 # TODO: UGLY, FIX THIS LATER!!!
 base_messages = chat_session.initialize_chat_session()
@@ -107,3 +110,16 @@ def chatSendMessage(request):
 def chatSendResponse(request):
     base_messages.append({"role": "assistant", "content": "Hell is empty, and all the devils are here."})
     return JsonResponse(base_messages[-1:], safe=False)
+
+# UEG code to experiment with MongoDB connections.
+def add_person(request):
+    records = {
+        "first_name": "John",
+        "last_name": "Smith",
+    }
+    person_collection.insert_one(records)
+    return HttpResponse(f"New person is added: {records}")
+
+def get_all_people(request):
+    people = person_collection.find()
+    return HttpResponse(people)

@@ -11,4 +11,8 @@ urlpatterns = [
     path('chat/', views.chat, name="chat"),
     path('chat-send-message/', views.chatSendMessage, name="chat-send-message"),
     path('chat-send-response/', views.chatSendResponse, name="chat-send-response"),
+
+    # UEG for experimenting with MongoDB
+    path('add/', views.add_person),
+    path('show/', views.get_all_people),
 ]
