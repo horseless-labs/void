@@ -33,10 +33,3 @@ def save_message(chat_id, user_id, username, message, timestamp, tokens_cb=None)
         chat_message["prompt_tokens"] = tokens_cb.prompt_tokens
         chat_message["completion_tokens"] = tokens_cb.completion_tokens
         chat_message["total_cost"] = tokens_cb.total_cost
-
-    try:
-        result = db.insert_one(chat_message)
-        if result.inserted_id:
-            print("Chat message saved successfully")
-    except errors.PyMongoError as e:
-        print(f"An error occurred: {e}")

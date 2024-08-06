@@ -17,11 +17,12 @@ from django.http import HttpResponse
 
 from .forms import UserForm
 from .services import chat_session
-from .models import person_collection
+from .models import Message, Conversation
 
 # TODO: UGLY, FIX THIS LATER!!!
-base_messages = chat_session.initialize_chat_session()
-chat_id = chat_session.generate_chat_id()
+# base_messages = chat_session.initialize_chat_session()
+# chat_id = chat_session.generate_chat_id()
+# conversation = None
 
 def home(request):
     return render(request, "base/home.html")
@@ -43,7 +44,11 @@ def loginPage(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")
+
+            conversation = Conversation.objects.create()
+            conversation.save()
+            print(conversation)
+            return redirect("chat", chat_id=conversation.chat_id)
         else:
             messages.error(request, "Username or password does not exist.")
 
@@ -84,27 +89,70 @@ def updateUser(request):
     return render(request, "base/update-user.html", {"form": form})
 
 # TODO: come back to this after handling login/registration
-def chat(request):
+def chat(request, chat_id):
     # TODO: implement real session management
-    username = request.user
-    context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
+    # username = request.user
+    # context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
 
-    if request.method == "POST":
-        return render(request, "base/chat.html", context=context)
-        # return JsonResponse(base_messages, safe=False)
+    # if request.method == "POST":
+    #     return render(request, "base/chat.html", context=context)
+    #     # return JsonResponse(base_messages, safe=False)
+    # return render(request, "base/chat.html", context=context)
+    # try:
+    #     conversation = Conversation.objects.get(chat_id=chat_id)
+    # except Conversation.DoesNotExist:
+    #     conversation = Conversation.objects.create(chat_id=chat_id)
+    conversation = Conversation.objects.get(chat_id=chat_id)
+    messages = Message.objects.filter(conversation=conversation).order_by('created')
+
+    context = {"username": request.user.username,
+               "conversation": conversation,
+               "messages": messages}
     return render(request, "base/chat.html", context=context)
+
+def chatManager(request, pk):
+    # Needs to take the user_id, run a query for all chat_ids associated with that user,
+    # then pass those chat_ids into manage_chats.html
+    user = User.objects.get(id=pk)
+    context = {"user": user}
+    return render(request, "base/manage_chats.html", context=context)
 
 # Handles the user's message
 @csrf_exempt
 def chatSendMessage(request):
     if request.method == 'POST':
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        data = json.loads(request.body.decode('utf-8'))
-        user_message = data.get("content")
-        base_messages.append({"role": "user", "content": user_message})
+        # data = json.loads(request.body.decode('utf-8'))
+        # user_message = data.get("content")
+        # base_messages.append({"role": "user", "content": user_message})
 
-        return JsonResponse(base_messages[-1], safe=False)
+        # return JsonResponse(base_messages[-1], safe=False)
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            user_message = data.get("content")
+            user_id = data.get("user_id")
+            chat_id = data.get("chat_id")
+
+            conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
+            user = User.objects.get(pk=user_id)
+
+            message = Message.objects.create(
+                user=user,
+                conversation=conversation,
+                body=user_message,
+                created=datetime.now()
+            )
+
+            response_data = {
+                "user": user.username,
+                "content": user_message,
+                "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
+            }
+
+            return JsonResponse(response_data, safe=False)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 

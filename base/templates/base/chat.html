@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 
-<div id="chat-container">
+<!-- <div id="chat-container">
     <div>Chat ID: {{ chat_id }}</div>
     {% for message in base_messages %}
         {% if not forloop.first %}
@@ -17,6 +17,26 @@
             {% endif %}
         {% endif %}
     {% endfor %}
+</div> -->
+<div id="chat-container">
+    <div>Chat ID: {{ conversation.chat_id }}</div>
+
+    <!-- Display messages -->
+    <div id="messages">
+        {% for message in messages %}
+            {% if message.user.username == username %}
+                <div class="message-user">
+                    {{ message.user.username }}: {{ message.body }}
+                    <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
+                </div>
+            {% else %}
+                <div class="message-computer">
+                    Veronica: {{ message.body }}
+                    <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
 
 <form method="post">
