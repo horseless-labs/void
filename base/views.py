@@ -94,6 +94,7 @@ def chat(request):
         return JsonResponse(base_messages, safe=False)
     return render(request, "base/chat.html", context=context)
 
+# Handles the user's message
 @csrf_exempt
 def chatSendMessage(request):
     if request.method == 'POST':
@@ -106,6 +107,7 @@ def chatSendMessage(request):
 
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
+# Handles the agent's reply
 @csrf_exempt
 def chatSendResponse(request):
     base_messages.append({"role": "assistant", "content": "Hell is empty, and all the devils are here."})
