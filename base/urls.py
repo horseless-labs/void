@@ -12,5 +12,5 @@ urlpatterns = [
     path('chat-send-message/<str:chat_id>', views.chatSendMessage, name="chat-send-message"),
     path('chat-send-response/<str:chat_id>', views.chatSendResponse, name="chat-send-response"),
 
-    path('chat-manager/', views.chatManager, name="chat-manager")
+    path('chat-manager/<int:user_id>', views.chatManager, name="chat-manager")
 ]

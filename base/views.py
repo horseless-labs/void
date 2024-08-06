@@ -45,11 +45,9 @@ def loginPage(request):
         if user is not None:
             login(request, user)
 
-            conversation = Conversation.objects.create()
-            conversation.initialize_chat(username=username)
-            # conversation.save()
-            # print(conversation)
-            return redirect("chat", chat_id=conversation.chat_id)
+            # conversation = Conversation.objects.create()
+            # conversation.initialize_chat(username=username)
+            return redirect("chat-manager", user_id=user)
         else:
             messages.error(request, "Username or password does not exist.")
 
@@ -101,11 +99,12 @@ def chat(request, chat_id):
                "chat_id": chat_id}
     return render(request, "base/chat.html", context=context)
 
-def chatManager(request, pk):
+def chatManager(request, user_id):
     # Needs to take the user_id, run a query for all chat_ids associated with that user,
     # then pass those chat_ids into manage_chats.html
-    user = User.objects.get(id=pk)
-    context = {"user": user}
+    user = User.objects.get(id=user_id)
+    chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
+    context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
 
 # Handles the user's message

@@ -1,6 +1,11 @@
-{% extents "main.html" %}
+{% extends "main.html" %}
 
 {% block content %}
 <div class="manage-chats-container">
+    <ul>
+        {% for chat_id in chat_ids %}
+            <li>{{ chat_id }}</li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

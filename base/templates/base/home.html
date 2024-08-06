@@ -18,7 +18,7 @@
     </p>
 
     {% if request.user.is_authenticated %}
-    <form method="post" action="{% url 'chat-manager' %}">
+    <form method="post" action="{% url 'chat-manager' user_id=user.id %}">
         {% csrf_token %}
 
         <button type="submit">Go to the Office</button>
