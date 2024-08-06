@@ -92,20 +92,9 @@ def updateUser(request):
 # TODO: come back to this after handling login/registration
 def chat(request, chat_id):
     # TODO: implement real session management
-    # username = request.user
-    # context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
-
-    # if request.method == "POST":
-    #     return render(request, "base/chat.html", context=context)
-    #     # return JsonResponse(base_messages, safe=False)
-    # return render(request, "base/chat.html", context=context)
-    # try:
-    #     conversation = Conversation.objects.get(chat_id=chat_id)
-    # except Conversation.DoesNotExist:
-    #     conversation = Conversation.objects.create(chat_id=chat_id)
     conversation = Conversation.objects.get(chat_id=chat_id)
     messages = Message.objects.filter(conversation=conversation).order_by('created')
-    print(messages)
+
     context = {"username": request.user.username,
                "conversation": conversation,
                "messages": messages}
@@ -120,41 +109,30 @@ def chatManager(request, pk):
 
 # Handles the user's message
 @csrf_exempt
-def chatSendMessage(request):
+def chatSendMessage(request, chat_id):
     if request.method == 'POST':
-        # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print("Hello from chatSendMessage")
+        user_message = request.POST.get("message", "").strip()
 
-        # data = json.loads(request.body.decode('utf-8'))
-        # user_message = data.get("content")
-        # base_messages.append({"role": "user", "content": user_message})
+        conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
+        user = User.objects.get(username=request.user)
 
-        # return JsonResponse(base_messages[-1], safe=False)
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-            user_message = data.get("content")
-            user_id = data.get("user_id")
-            chat_id = data.get("chat_id")
+        message = Message.objects.create(
+            user=user,
+            conversation=conversation,
+            role="user",
+            body=user_message
+        )
+        print(message)
+        message.save()
 
-            conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
-            user = User.objects.get(pk=user_id)
-
-            message = Message.objects.create(
-                user=user,
-                conversation=conversation,
-                body=user_message,
-                created=datetime.now()
-            )
-
-            response_data = {
-                "user": user.username,
-                "content": user_message,
-                "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
-            }
-
-            return JsonResponse(response_data, safe=False)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
+        response_data = {
+            "user": user.username,
+            "content": user_message,
+            "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        return JsonResponse(response_data, safe=False, status=201)
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
 # Handles the agent's reply

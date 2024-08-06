@@ -9,8 +9,8 @@ urlpatterns = [
     
     path('', views.home, name="home"),
     path('chat/<str:chat_id>', views.chat, name="chat"),
-    path('chat-send-message/', views.chatSendMessage, name="chat-send-message"),
-    path('chat-send-response/', views.chatSendResponse, name="chat-send-response"),
+    path('chat-send-message/<str:chat_id>', views.chatSendMessage, name="chat-send-message"),
+    path('chat-send-response/<str:chat_id>', views.chatSendResponse, name="chat-send-response"),
 
     path('chat-manager/', views.chatManager, name="chat-manager")
 ]

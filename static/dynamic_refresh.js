@@ -7,10 +7,13 @@ var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('
 console.log(`The sourceName is ${sourceName}`)
 console.log(`The user is ${userName}`);
 
-const form = document.querySelector("form")
-const inputBox = document.querySelector("input[name='message']")
+// const form = document.querySelector("form")
+const form = document.getElementById("message-form")
+// const inputBox = document.querySelector("input[name='message']")
+const inputBox = document.getElementById("message-input")
 const chatContainer = document.getElementById("chat-container")
-const submitButton = document.getElementById("send-btn")
+// const submitButton = document.getElementById("send-btn")
+const submitButton = form.querySelector("button[type='submit'")
 console.log("Hello from this script")
 
 // Add event listener to the form
