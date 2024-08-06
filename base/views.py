@@ -113,16 +113,3 @@ def chatSendMessage(request):
 def chatSendResponse(request):
     base_messages.append({"role": "assistant", "content": "Hell is empty, and all the devils are here."})
     return JsonResponse(base_messages[-1:], safe=False)
-
-# UEG code to experiment with MongoDB connections.
-def add_person(request):
-    records = {
-        "first_name": "John",
-        "last_name": "Smith",
-    }
-    person_collection.insert_one(records)
-    return HttpResponse(f"New person is added: {records}")
-
-def get_all_people(request):
-    people = person_collection.find()
-    return HttpResponse(people)
