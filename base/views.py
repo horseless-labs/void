@@ -46,8 +46,9 @@ def loginPage(request):
             login(request, user)
 
             conversation = Conversation.objects.create()
-            conversation.save()
-            print(conversation)
+            conversation.initialize_chat(username=username)
+            # conversation.save()
+            # print(conversation)
             return redirect("chat", chat_id=conversation.chat_id)
         else:
             messages.error(request, "Username or password does not exist.")
@@ -104,7 +105,7 @@ def chat(request, chat_id):
     #     conversation = Conversation.objects.create(chat_id=chat_id)
     conversation = Conversation.objects.get(chat_id=chat_id)
     messages = Message.objects.filter(conversation=conversation).order_by('created')
-
+    print(messages)
     context = {"username": request.user.username,
                "conversation": conversation,
                "messages": messages}

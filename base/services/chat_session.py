@@ -15,6 +15,7 @@ def initialize_chat_session():
         {"role": "system", "content": "You are a helpful assistant" },
         {"role": "agent", "content": "What's a good way to get things done?"},
         {"role": "user", "content": "Just be brave and have no doubt."},
+        {"role": "agent", "content": "Girls just wanna have fun."}
     ]
     return base_messages
 
@@ -29,6 +30,7 @@ def save_message(chat_id, user_id, username, message, timestamp, tokens_cb=None)
 
     # Will only be added to the agent's messages
     if tokens_cb != None:
+        chat_message["user_id"] = "agent" # TODO: think if this is a good way of doing this
         chat_message["total_tokens"] = tokens_cb.total_tokens
         chat_message["prompt_tokens"] = tokens_cb.prompt_tokens
         chat_message["completion_tokens"] = tokens_cb.completion_tokens

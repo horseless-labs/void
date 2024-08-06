@@ -6,44 +6,43 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 
-<!-- <div id="chat-container">
-    <div>Chat ID: {{ chat_id }}</div>
-    {% for message in base_messages %}
-        {% if not forloop.first %}
-            {% if message.role == "user" %}
-                <div class="message-user">{{ request.user.username }}: {{ message.content }}</div>
-            {% else %}
-                <div class="message-computer">Veronica: {{ message.content }}</div>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-</div> -->
 <div id="chat-container">
     <div>Chat ID: {{ conversation.chat_id }}</div>
 
     <!-- Display messages -->
     <div id="messages">
-        {% for message in messages %}
-            {% if message.user.username == username %}
-                <div class="message-user">
-                    {{ message.user.username }}: {{ message.body }}
-                    <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
-                </div>
-            {% else %}
-                <div class="message-computer">
-                    Veronica: {{ message.body }}
-                    <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
-                </div>
-            {% endif %}
-        {% endfor %}
+        {% if not forloop.first %}
+            {% for message in messages %}
+                {% if not forloop.first %}
+                    {% if message.user.username == username %}
+                        <div class="message-user">
+                            {{ message.user.username }}: {{ message.body }}
+                            <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
+                        </div>
+                    {% else %}
+                        <div class="message-computer">
+                            Veronica: {{ message.body }}
+                            <span class="timestamp">{{ message.created|date:"Y-m-d H:i:s" }}</span>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
+
+    <!-- Message input form -->
+    <form id="message-form" method="post" action="{% url 'chat' chat_id=conversation.chat_id %}">
+        {% csrf_token %}
+        <textarea name="message" id="message-input" rows="3" placeholder="Type your message here..."></textarea>
+        <button type="submit">Send</button>
+    </form>
 </div>
 
-<form method="post">
+<!-- <form method="post">
     {% csrf_token %}
     <input type="text" name="message" placeholder="Type your message here...">
     <button type="submit" value="Send" id="send-btn">Send</button>
-</form>
+</form> -->
 
 <script>
     // Define global variables
