@@ -90,8 +90,8 @@ def chat(request):
     context = {"username": username, "chat_id": chat_id, "base_messages": base_messages}
 
     if request.method == "POST":
-        # return render(request, "base/chat.html", context=context)
-        return JsonResponse(base_messages, safe=False)
+        return render(request, "base/chat.html", context=context)
+        # return JsonResponse(base_messages, safe=False)
     return render(request, "base/chat.html", context=context)
 
 # Handles the user's message
@@ -103,6 +103,7 @@ def chatSendMessage(request):
         data = json.loads(request.body.decode('utf-8'))
         user_message = data.get("content")
         base_messages.append({"role": "user", "content": user_message})
+
         return JsonResponse(base_messages[-1], safe=False)
 
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)

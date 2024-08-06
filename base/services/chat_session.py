@@ -3,7 +3,7 @@ import string
 
 from pymongo import errors
 
-from db_connection import db
+from .db_connection import db
 # Helper functions
 
 def generate_chat_id(length=32):
