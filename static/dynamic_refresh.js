@@ -3,17 +3,18 @@
 var computerName = window.computerName;
 var userName = window.userName;
 var sourceName = window.sourceName;
+var chat_id = window.chat_id;
 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 console.log(`The sourceName is ${sourceName}`)
 console.log(`The user is ${userName}`);
 
-// const form = document.querySelector("form")
-const form = document.getElementById("message-form")
-// const inputBox = document.querySelector("input[name='message']")
-const inputBox = document.getElementById("message-input")
+const form = document.querySelector("form")
+// const form = document.getElementById("message-form")
+const inputBox = document.querySelector("input[name='message']")
+// const inputBox = document.getElementById("message-input")
 const chatContainer = document.getElementById("chat-container")
-// const submitButton = document.getElementById("send-btn")
-const submitButton = form.querySelector("button[type='submit'")
+const submitButton = document.getElementById("send-btn")
+// const submitButton = form.querySelector("button[type='submit'")
 console.log("Hello from this script")
 
 // Add event listener to the form
@@ -25,7 +26,7 @@ submitButton.addEventListener("click", (event) => {
     console.log(message)
     console.log("Form submitted");
 
-    fetch(`/${sourceName}-send-message/`, {
+    fetch(`/${sourceName}-send-message/${chat_id}`, {
         method: "POST",
         body: JSON.stringify({ content: message }),
         headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
@@ -40,10 +41,10 @@ submitButton.addEventListener("click", (event) => {
         chatContainer.appendChild(messageElement);
     })    
     .then(() => {
-        return fetch(`/${sourceName}-send-response/`, {
+        return fetch(`/${sourceName}-send-response/${chat_id}`, {
             method: "POST",
             body: JSON.stringify({ content: message }),
-            headers: { "Content-Type": "application/json"},
+            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
         })
     })
     .then ((response) => {
@@ -51,8 +52,8 @@ submitButton.addEventListener("click", (event) => {
     })
     .then ((data) => {
         const messageElement = document.createElement("div");
-        messageElement.className = data[0].role === "user" ? "message-user" : "message-computer";
-        messageElement.innerText = `${data[0].role === "user" ? userName + ": " : computerName + ": "}${data[0].content}`;
+        messageElement.className = data.role === "user" ? "message-user" : "message-computer";
+        messageElement.innerText = `${data.role === "user" ? userName + ": " : computerName + ": "}${data[0].content}`;
         chatContainer.appendChild(messageElement);
     })
     .catch((error) => {

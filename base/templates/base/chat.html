@@ -30,6 +30,11 @@
         {% endif %}
     </div>
 
+    <!-- <form method="post">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Type your message here...">
+        <button type="submit" value="Send" id="send-btn">Send</button>
+    </form> -->
     <!-- Message input form -->
     <form id="message-form" method="post" action="{% url 'chat-send-message' chat_id=conversation.chat_id %}">
         {% csrf_token %}
@@ -38,12 +43,6 @@
     </form>
 </div>
 
-<!-- <form method="post">
-    {% csrf_token %}
-    <input type="text" name="message" placeholder="Type your message here...">
-    <button type="submit" value="Send" id="send-btn">Send</button>
-</form> -->
-
 <script>
     // Define global variables
     // TODO: double-check that this is an okay thing to do. Feels sloppy :/
@@ -51,6 +50,7 @@
     window.userName = "{{ request.user.username }}";
     window.role = "{{ message.role }}"
     window.sourceName = "chat";
+    window.chat_id = "{{ chat_id }}"
 </script>
 <script src="{% static 'dynamic_refresh.js' %}"></script>
 {% endblock %}

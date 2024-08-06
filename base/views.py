@@ -97,7 +97,8 @@ def chat(request, chat_id):
 
     context = {"username": request.user.username,
                "conversation": conversation,
-               "messages": messages}
+               "messages": messages,
+               "chat_id": chat_id}
     return render(request, "base/chat.html", context=context)
 
 def chatManager(request, pk):
@@ -111,7 +112,6 @@ def chatManager(request, pk):
 @csrf_exempt
 def chatSendMessage(request, chat_id):
     if request.method == 'POST':
-        print("Hello from chatSendMessage")
         user_message = request.POST.get("message", "").strip()
 
         conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
@@ -129,14 +129,36 @@ def chatSendMessage(request, chat_id):
         response_data = {
             "user": user.username,
             "content": user_message,
-            "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S"),
+            "chat_id": conversation.chat_id
         }
         
-        return JsonResponse(response_data, safe=False, status=201)
+        # return JsonResponse(response_data, safe=False, status=201)
+        return redirect('chat-send-response', chat_id=chat_id)
+        # return redirect('chat', chat_id=chat_id)
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
 # Handles the agent's reply
 @csrf_exempt
-def chatSendResponse(request):
-    base_messages.append({"role": "assistant", "content": "Hell is empty, and all the devils are here."})
-    return JsonResponse(base_messages[-1:], safe=False)
+def chatSendResponse(request, chat_id):
+    agent_message = "I'm sorry, Dave. I'm afraid I can't do that."
+
+    conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
+    user = User.objects.get(username=request.user)
+
+    message = Message.objects.create(
+        user=None,
+        conversation=conversation,
+        role="agent",
+        body=agent_message
+    )
+    print(message)
+    message.save()
+
+    response_data = {
+        "user": user.username,
+        "content": agent_message,
+        "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    return redirect("chat", chat_id=chat_id)
