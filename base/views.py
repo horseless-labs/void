@@ -108,6 +108,11 @@ def chatManager(request, username):
     context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
 
+def createNewChat(request, username):
+    conversation = Conversation.objects.create()
+    conversation.initialize_chat(username=username)
+    return redirect("chat", chat_id=conversation.chat_id)
+
 # Handles the user's message
 @csrf_exempt
 def chatSendMessage(request, chat_id):
