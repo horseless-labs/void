@@ -2,12 +2,14 @@ from datetime import datetime
 import json
 
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib import messages
 
 # Authentication imports
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -25,6 +27,10 @@ from .models import Message, Conversation
 # conversation = None
 
 def home(request):
+    user = request.user
+    
+    if user.is_authenticated:
+        return redirect('chat-manager', username=user)
     return render(request, "base/home.html")
 
 def loginPage(request):
@@ -55,13 +61,12 @@ def loginPage(request):
     context = {"page": page}
     return render(request, "base/login_register.html", context)
 
+
 def logoutUser(request):
     logout(request)
     return redirect("home")
 
 def registerPage(request):
-    form = UserCreationForm()
-
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -69,8 +74,11 @@ def registerPage(request):
             user.username = user.username.lower()
             user.save()
             login(request, user)
+            return redirect('home')
         else:
             messages.error(request, "An error occurred during registration.")
+    else:
+        form = UserCreationForm()
     
     context = {"form": form}
     return render(request, "base/login_register.html", context)
