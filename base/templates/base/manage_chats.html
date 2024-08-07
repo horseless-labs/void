@@ -4,7 +4,7 @@
 <div class="manage-chats-container">
     <ul>
         {% for chat_id in chat_ids %}
-            <li>{{ chat_id }}</li>
+            <li><a href="{% url 'chat' chat_id=chat_id %}">{{ chat_id }}</a></li>
         {% endfor %}
     </ul>
 </div>
