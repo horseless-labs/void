@@ -47,7 +47,8 @@ def loginPage(request):
 
             # conversation = Conversation.objects.create()
             # conversation.initialize_chat(username=username)
-            return redirect("chat-manager", user_id=user)
+            print(user)
+            return redirect("chat-manager", username=username)
         else:
             messages.error(request, "Username or password does not exist.")
 
@@ -99,10 +100,10 @@ def chat(request, chat_id):
                "chat_id": chat_id}
     return render(request, "base/chat.html", context=context)
 
-def chatManager(request, user_id):
+def chatManager(request, username):
     # Needs to take the user_id, run a query for all chat_ids associated with that user,
     # then pass those chat_ids into manage_chats.html
-    user = User.objects.get(id=user_id)
+    user = User.objects.get(username=username)
     chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
     context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
