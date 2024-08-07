@@ -84,6 +84,7 @@ def registerPage(request):
     return render(request, "base/login_register.html", context)
 
 # TODO: test this later, as it is currently unconnected to anything.
+@login_required(login_url='login')
 def updateUser(request):
     user = request.user
     form = UserForm(request.POST, instance=user)
@@ -96,10 +97,14 @@ def updateUser(request):
     
     return render(request, "base/update-user.html", {"form": form})
 
-# TODO: come back to this after handling login/registration
+@login_required(login_url='login')
 def chat(request, chat_id):
     # TODO: implement real session management
     conversation = Conversation.objects.get(chat_id=chat_id)
+
+    if conversation.user != request.user:
+        return render(request, "base/403.html")
+
     messages = Message.objects.filter(conversation=conversation).order_by('created')
 
     context = {"username": request.user.username,
@@ -108,14 +113,17 @@ def chat(request, chat_id):
                "chat_id": chat_id}
     return render(request, "base/chat.html", context=context)
 
+@login_required(login_url='login')
 def chatManager(request, username):
-    # Needs to take the user_id, run a query for all chat_ids associated with that user,
-    # then pass those chat_ids into manage_chats.html
+    if request.user.username != username:
+        return render(request, "base/403.html")
+
     user = User.objects.get(username=username)
     chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
     context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
 
+@login_required(login_url='login')
 def createNewChat(request, username):
     conversation = Conversation.objects.create()
     conversation.initialize_chat(username=username)

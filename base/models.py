@@ -8,6 +8,7 @@ from .services import chat_session
 class Conversation(models.Model):
     chat_id = models.CharField(max_length=64, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def initialize_chat(self, username=None):
         self.base_messages = chat_session.initialize_chat_session()
