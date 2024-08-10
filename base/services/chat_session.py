@@ -13,10 +13,7 @@ def generate_chat_id(length=32):
 def initialize_chat_session():
     base_messages = [
         {"role": "system", "content": "You are a helpful assistant" },
-        {"role": "agent", "content": "What's a good way to get things done?"},
-        {"role": "user", "content": "Just be brave and have no doubt."},
-        {"role": "agent", "content": "Girls just wanna have fun."},
-        {"role": "user", "content": "Blah blah blah, I'm so bored."},
+        {"role": "agent", "content": "What's on your mind?"},
     ]
     return base_messages
 
