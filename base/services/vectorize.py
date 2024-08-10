@@ -32,6 +32,8 @@ def check_db_existence(db_path):
     if not os.path.isdir(db_path):
         raise NotADirectoryError(f"The DB directory '{db_path}' does not exist.")
 
+# TODO: at the moment, the plan is one index per user, so we need to figure out a cleaner
+#       way to do this.
 def init_faiss(db_path="./faiss_index"):
     if os.path.exists(db_path):
         print(f"FAISS index already exists at {db_path}. Aborting.")
@@ -55,37 +57,30 @@ def open_faiss_index(db_path):
     vector_store = FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
     return vector_store
 
+# `doc` here is the path to a plaintext document
 def add_doc_to_store(doc, db_path="./faiss_index"):
     check_document_existence(doc)
     check_db_existence(db_path)
 
-    with open("openai_api_key.txt", "r") as file:
-        key = file.read().strip()
-
     with open(doc, "r") as file:
         content = file.read()
-    print(content)
 
-    embeddings = OpenAIEmbeddings(api_key=key)
-
+    # TODO: Figure out chunk size optimization
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=10)
     splits = text_splitter.split_text(content)
     documents = [Document(page_content=x) for x in splits]
-    print(documents)
-
-    """
-    index = faiss.IndexFlatL2(len(OpenAIEmbeddings().embed_query("hello world")))
-
-    vector_store = FAISS(
-        embedding_function=OpenAIEmbeddings(),
-        index=index,
-        docstore=InMemoryDocstore(),
-        index_to_docstore_id={}
-    )
-    """
 
     vector_store = open_faiss_index(db_path)
 
+    vector_store.add_documents(documents)
+    vector_store.save_local(db_path)
+
+# Add a user's chat string to their vector store
+def add_string_to_store(chat_string, db_path="./faiss_index"):
+    vector_store = open_faiss_index(db_path)
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=25)
+    documents = text_splitter.split_documents(chat_string)
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
 
@@ -94,6 +89,6 @@ if __name__ == '__main__':
     # add_doc_to_store("new_doc.txt")
 
     vector_store = open_faiss_index("./faiss_index")
-    results = vector_store.similarity_search(query="appreciating the little things", k=1)
-    for doc in results:
-        print(f"* {doc.page_content} [{doc.metadata}]")
+    results = vector_store.similarity_search_with_score(query="expansion between the two world wars", k=1)
+    for doc, score in results:
+        print(f"* {doc.page_content} [{doc.metadata}], score: {score}")
