@@ -7,6 +7,7 @@ __pycache__/
 # Database
 db.sqlite3
 *.db
+faiss_index/
 
 # Media and static files
 media/
@@ -14,3 +15,4 @@ staticfiles/
 
 # Misc
 *.sw*
+*.txt

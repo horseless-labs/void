@@ -21,11 +21,6 @@ from .forms import UserForm
 from .services import chat_session
 from .models import Message, Conversation
 
-# TODO: UGLY, FIX THIS LATER!!!
-# base_messages = chat_session.initialize_chat_session()
-# chat_id = chat_session.generate_chat_id()
-# conversation = None
-
 def home(request):
     user = request.user
     
@@ -50,10 +45,6 @@ def loginPage(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-
-            # conversation = Conversation.objects.create()
-            # conversation.initialize_chat(username=username)
-            print(user)
             return redirect("chat-manager", username=username)
         else:
             messages.error(request, "Username or password does not exist.")
@@ -154,9 +145,7 @@ def chatSendMessage(request, chat_id):
             "chat_id": conversation.chat_id
         }
         
-        # return JsonResponse(response_data, safe=False, status=201)
         return redirect('chat-send-response', chat_id=chat_id)
-        # return redirect('chat', chat_id=chat_id)
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
 # Handles the agent's reply
