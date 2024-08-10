@@ -84,11 +84,15 @@ def add_string_to_store(chat_string, db_path="./faiss_index"):
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
 
-if __name__ == '__main__':
-    # init_faiss()
-    # add_doc_to_store("new_doc.txt")
+def query_store(query, db_path="./faiss_index"):
+    vector_store = open_faiss_index(db_path)
+    results = vector_store.similarity_search_with_score(query=query)
 
-    vector_store = open_faiss_index("./faiss_index")
-    results = vector_store.similarity_search_with_score(query="expansion between the two world wars", k=1)
+    output = ""
     for doc, score in results:
-        print(f"* {doc.page_content} [{doc.metadata}], score: {score}")
+        output += f"* {doc.page_content} [{doc.metadata}], score: {score}\n"
+
+    return output
+
+# if __name__ == '__main__':
+#     init_faiss()
