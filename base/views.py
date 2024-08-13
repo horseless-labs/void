@@ -93,7 +93,9 @@ def chat(request, chat_id):
     # TODO: implement real session management
     conversation = Conversation.objects.get(chat_id=chat_id)
 
-    if conversation.user != request.user:
+    if conversation.user.username != request.user.username:
+        print(conversation.user_id)
+        print(request.user.username)
         return render(request, "base/403.html")
 
     messages = Message.objects.filter(conversation=conversation).order_by('created')
@@ -116,7 +118,11 @@ def chatManager(request, username):
 
 @login_required(login_url='login')
 def createNewChat(request, username):
-    conversation = Conversation.objects.create()
+    user = User.objects.get(username=username)
+    conversation = Conversation.objects.create(
+        user=user,
+    )
+    print(f"conversation.user: {conversation.user}")
     conversation.initialize_chat(username=username)
     return redirect("chat", chat_id=conversation.chat_id)
 
