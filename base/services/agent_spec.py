@@ -89,7 +89,8 @@ def init_agent():
 
     llm_chain = prompt | chat
     agent = create_structured_chat_agent(llm=chat, tools=tools, prompt=prompt)
-    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True)
+    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    # TODO: figure out how the session stuff will actually work.
     memory = ChatMessageHistory(session_id="test-session")
     agent_with_chat_history = RunnableWithMessageHistory(
         agent_executor,
@@ -99,10 +100,20 @@ def init_agent():
     )
     return agent_with_chat_history
 
+def get_agent_output(agent, human_message, chat_id):
+    result = agent.invoke(
+        {"input": human_message},
+        config={
+            "configurable": {
+                "session_id": chat_id,
+            }
+        }
+    )
+
+    return result
+
 if __name__ == '__main__':
     agent = init_agent()
-    human_message = "When was Barack Obama born?"
-    agent.invoke(
-        {"input": human_message},
-        config={"configurable": {"session_id": "test-session"}}
-    )
+    human_message = "What is the weather like in Cleveland, OH right now?"
+    result = get_agent_output(agent, human_message, "test-session")
+    print(result["output"])
