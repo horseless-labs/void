@@ -3,7 +3,7 @@ import string
 
 # Helper functions
 
-def generate_chat_id(length=32):
+def generate_chat_id(length=64):
     chat_id = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
     # print(f"New chat_id generated: {chat_id}")
     return chat_id

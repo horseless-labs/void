@@ -98,7 +98,8 @@ def chat(request, chat_id):
         print(request.user.username)
         return render(request, "base/403.html")
 
-    messages = Message.objects.filter(conversation=conversation).order_by('created')
+    # messages = Message.objects.filter(conversation=conversation).order_by('created')
+    messages = Message.objects.filter(chat_id=chat_id).order_by('created')
 
     context = {"username": request.user.username,
                "conversation": conversation,
@@ -112,7 +113,8 @@ def chatManager(request, username):
         return render(request, "base/403.html")
 
     user = User.objects.get(username=username)
-    chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
+    # chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
+    chat_ids = Message.objects.filter(user=user).distinct().values_list("chat_id", flat=True)
     context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
 
@@ -137,7 +139,8 @@ def chatSendMessage(request, chat_id):
 
         message = Message.objects.create(
             user=user,
-            conversation=conversation,
+            # conversation=conversation,
+            chat_id=chat_id,
             role="user",
             body=user_message
         )
@@ -164,7 +167,8 @@ def chatSendResponse(request, chat_id):
 
     message = Message.objects.create(
         user=None,
-        conversation=conversation,
+        # conversation=conversation,
+        chat_id=chat_id,
         role="agent",
         body=agent_message
     )

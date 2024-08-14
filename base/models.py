@@ -12,6 +12,7 @@ class Conversation(models.Model):
 
     def initialize_chat(self, username=None):
         self.base_messages = chat_session.initialize_chat_session()
+        self.chat_id = chat_session.generate_chat_id()
         self.save()
 
         for message_data in self.base_messages:
@@ -24,7 +25,8 @@ class Conversation(models.Model):
             
             message = Message.objects.create(
                 user=user,
-                conversation=self,
+                # conversation=self,
+                chat_id=self.chat_id,
                 role=role,
                 body=content
             )
@@ -48,7 +50,8 @@ class Message(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    # conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    chat_id = models.CharField(max_length=64)
     body = models.TextField()
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
