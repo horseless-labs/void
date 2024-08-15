@@ -13,7 +13,8 @@ from langchain_community.tools import DuckDuckGoSearchRun, DuckDuckGoSearchResul
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from vectorize import open_faiss_index
+from .vectorize import open_faiss_index
+from ..models import Message
 
 test_system_message = """Begin!
 
@@ -79,25 +80,36 @@ Thought:{agent_scratchpad}'''
 # prompt = PromptTemplate.from_template(system)
 prompt = hub.pull("hwchase17/structured-chat-agent")
 
-def init_agent():
+def load_chats(chat_id):
+    messages = Message.objects.filter(chat_id=chat_id).order_by('created')
+    return list(messages)
+
+def init_agent(chat_id):
     prefix = test_system_message
     suffix = test_system_message
 
-    with open("openai_api_key.txt", "r") as file:
+    with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
     chat = ChatOpenAI(api_key=key, temperature=0.5)
 
     llm_chain = prompt | chat
     agent = create_structured_chat_agent(llm=chat, tools=tools, prompt=prompt)
     agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
     # TODO: figure out how the session stuff will actually work.
     memory = ChatMessageHistory(session_id="test-session")
+    chats = load_chats(chat_id)
+
+    for chat in chats:
+        memory.add_message(chat.body)
+
     agent_with_chat_history = RunnableWithMessageHistory(
         agent_executor,
         lambda session_id: memory,
         input_messages_key="input",
         history_messages_key="chat_history",
     )
+
     return agent_with_chat_history
 
 def get_agent_output(agent, human_message, chat_id):

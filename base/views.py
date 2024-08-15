@@ -18,7 +18,7 @@ from django.utils.timezone import now
 from django.http import HttpResponse
 
 from .forms import UserForm
-from .services import chat_session
+from .services import chat_session, agent_spec
 from .models import Message, Conversation
 
 def home(request):
@@ -153,6 +153,8 @@ def chatSendMessage(request, chat_id):
             "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S"),
             "chat_id": conversation.chat_id
         }
+
+        request.session["mr_human_message"] = user_message
         
         return redirect('chat-send-response', chat_id=chat_id)
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
@@ -160,7 +162,10 @@ def chatSendMessage(request, chat_id):
 # Handles the agent's reply
 @csrf_exempt
 def chatSendResponse(request, chat_id):
-    agent_message = "I'm sorry, Dave. I'm afraid I can't do that."
+    # agent_message = "I'm sorry, Dave. I'm afraid I can't do that."
+    message = request.session["mr_human_message"]
+    agent = agent_spec.init_agent(chat_id)
+    agent_message = agent_spec.get_agent_output(agent, message, chat_id)
 
     conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
     user = User.objects.get(username=request.user)
@@ -170,7 +175,7 @@ def chatSendResponse(request, chat_id):
         # conversation=conversation,
         chat_id=chat_id,
         role="agent",
-        body=agent_message
+        body=agent_message["output"]
     )
     print(message)
     message.save()
