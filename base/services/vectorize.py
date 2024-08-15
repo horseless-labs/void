@@ -50,7 +50,7 @@ def init_faiss(db_path="./faiss_index"):
     vector_db.save_local(db_path)
 
 def open_faiss_index(db_path):
-    with open("openai_api_key.txt", "r") as file:
+    with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
 
     embeddings = OpenAIEmbeddings(api_key=key)
@@ -58,6 +58,8 @@ def open_faiss_index(db_path):
     return vector_store
 
 # `doc` here is the path to a plaintext document
+# This function or a version of it will come into play in the implementation
+# of Journal Mode
 def add_doc_to_store(doc, db_path="./faiss_index"):
     check_document_existence(doc)
     check_db_existence(db_path)
@@ -80,10 +82,13 @@ def add_string_to_store(chat_string, db_path="./faiss_index"):
     vector_store = open_faiss_index(db_path)
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=25)
-    documents = text_splitter.split_documents(chat_string)
+    splits = text_splitter.split_text(chat_string)
+    documents = [Document(page_content=x) for x in splits]
+    print(f"From vectorize.py, add_string_to_store.\nSplits: {splits}\ndocuments: {documents}")
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
 
+# Makes a query to the given vector store.
 def query_store(query, db_path="./faiss_index"):
     vector_store = open_faiss_index(db_path)
     results = vector_store.similarity_search_with_score(query=query)

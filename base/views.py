@@ -1,5 +1,5 @@
 from datetime import datetime
-import json
+import json, os
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -18,8 +18,11 @@ from django.utils.timezone import now
 from django.http import HttpResponse
 
 from .forms import UserForm
-from .services import chat_session, agent_spec
+from .services import agent_spec, vectorize
 from .models import Message, Conversation
+
+# TODO: get rid of this when development is done
+faiss_index = "base/services/faiss_index"
 
 def home(request):
     user = request.user
@@ -90,7 +93,6 @@ def updateUser(request):
 
 @login_required(login_url='login')
 def chat(request, chat_id):
-    # TODO: implement real session management
     conversation = Conversation.objects.get(chat_id=chat_id)
 
     if conversation.user.username != request.user.username:
@@ -98,7 +100,6 @@ def chat(request, chat_id):
         print(request.user.username)
         return render(request, "base/403.html")
 
-    # messages = Message.objects.filter(conversation=conversation).order_by('created')
     messages = Message.objects.filter(chat_id=chat_id).order_by('created')
 
     context = {"username": request.user.username,
@@ -113,7 +114,6 @@ def chatManager(request, username):
         return render(request, "base/403.html")
 
     user = User.objects.get(username=username)
-    # chat_ids = Conversation.objects.filter(message__user=user).distinct().values_list("chat_id", flat=True)
     chat_ids = Message.objects.filter(user=user).distinct().values_list("chat_id", flat=True)
     context = {"user": user, "chat_ids": chat_ids}
     return render(request, "base/manage_chats.html", context=context)
@@ -139,13 +139,20 @@ def chatSendMessage(request, chat_id):
 
         message = Message.objects.create(
             user=user,
-            # conversation=conversation,
             chat_id=chat_id,
             role="user",
             body=user_message
         )
         print(message)
         message.save()
+
+        try:
+            print(f"Attempting to add the message {message.body} to the default index")
+            vectorize.add_string_to_store(message.body, faiss_index)
+            print("Success")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print("Failed to add the message to the index.")
 
         response_data = {
             "user": user.username,
@@ -154,6 +161,7 @@ def chatSendMessage(request, chat_id):
             "chat_id": conversation.chat_id
         }
 
+        # Stores the most recent message from the user in the Django session
         request.session["mr_human_message"] = user_message
         
         return redirect('chat-send-response', chat_id=chat_id)
@@ -162,7 +170,6 @@ def chatSendMessage(request, chat_id):
 # Handles the agent's reply
 @csrf_exempt
 def chatSendResponse(request, chat_id):
-    # agent_message = "I'm sorry, Dave. I'm afraid I can't do that."
     message = request.session["mr_human_message"]
     agent = agent_spec.init_agent(chat_id)
     agent_message = agent_spec.get_agent_output(agent, message, chat_id)
@@ -172,13 +179,20 @@ def chatSendResponse(request, chat_id):
 
     message = Message.objects.create(
         user=None,
-        # conversation=conversation,
         chat_id=chat_id,
         role="agent",
         body=agent_message["output"]
     )
     print(message)
     message.save()
+
+    try:
+        print(f"Attempting to add the message {message.body} to the default index")
+        vectorize.add_string_to_store(agent_message["output"], faiss_index)
+        print("Success")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print("Failed to add the message to the index.")
 
     response_data = {
         "user": user.username,
