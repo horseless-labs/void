@@ -57,6 +57,13 @@ def open_faiss_index(db_path):
     vector_store = FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
     return vector_store
 
+def open_or_create_faiss_index(username):
+    with open("base/services/openai_api_key.txt", "r") as file:
+        key = file.read().strip()
+    
+    db_path = f"base/indices/{username}_faiss_index"
+    init_faiss(db_path)
+
 # `doc` here is the path to a plaintext document
 # This function or a version of it will come into play in the implementation
 # of Journal Mode

@@ -22,7 +22,6 @@ from .services import agent_spec, vectorize
 from .models import Message, Conversation
 
 # TODO: get rid of this when development is done
-faiss_index = "base/services/faiss_index"
 
 def home(request):
     user = request.user
@@ -68,6 +67,7 @@ def registerPage(request):
             user.username = user.username.lower()
             user.save()
             login(request, user)
+            vectorize.open_or_create_faiss_index(user.username)
             return redirect('home')
         else:
             messages.error(request, "An error occurred during registration.")
@@ -147,7 +147,8 @@ def chatSendMessage(request, chat_id):
         message.save()
 
         try:
-            print(f"Attempting to add the message {message.body} to the default index")
+            faiss_index = f"base/indices/{request.user.username}_faiss_index"
+            print(f"Attempting to add the message {message.body} to {faiss_index}")
             vectorize.add_string_to_store(message.body, faiss_index)
             print("Success")
         except Exception as e:
@@ -187,7 +188,8 @@ def chatSendResponse(request, chat_id):
     message.save()
 
     try:
-        print(f"Attempting to add the message {message.body} to the default index")
+        faiss_index = f"base/indices/{request.user.username}_faiss_index"
+        print(f"Attempting to add the message {message.body} to the {faiss_index}")
         vectorize.add_string_to_store(agent_message["output"], faiss_index)
         print("Success")
     except Exception as e:
