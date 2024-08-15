@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<div id="journal-container">
+    <h2>Journal Entry</h2>
+
+    <!-- Journal entry form -->
+    <form id="journal-form" method="post" action="{% url 'submit-journal-entry' username=user %}">
+        {% csrf_token %}
+        <textarea name="journal_entry" id="journal-input" rows="15" placeholder="Write your journal entry here..."></textarea>
+        <button type="submit" id="submit-btn">Submit</button>
+    </form>
+</div>
+
+{% endblock %}

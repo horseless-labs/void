@@ -18,7 +18,7 @@ from django.utils.timezone import now
 from django.http import HttpResponse
 
 from .forms import UserForm
-from .services import agent_spec, vectorize
+from .services import agent_spec, vectorize, chat_session
 from .models import Message, Conversation
 
 # TODO: get rid of this when development is done
@@ -107,6 +107,40 @@ def chat(request, chat_id):
                "messages": messages,
                "chat_id": chat_id}
     return render(request, "base/chat.html", context=context)
+
+@login_required(login_url='login')
+def journal(request, username):
+    if request.method == "POST":
+        journal_entry = request.POST.get("journal_entry", "").strip()
+        print(journal_entry)
+        
+        user = User.objects.get(username=request.user)
+
+        # Currently saving Journals the same way as Messages.
+        # Might change later.
+        message = Message.objects.create(
+            user=user,
+            # In this implementation, a journal entry also has a unique chat id
+            # This will make it visible in the Chat Manager
+            chat_id=chat_session.generate_chat_id(),
+            role="user",
+            body=journal_entry
+        )
+
+        print(message)
+        message.save()
+
+        try:
+            faiss_index = f"base/indices/{request.user.username}_faiss_index"
+            print(f"Attempting to add the message {message.body} to {faiss_index}")
+            vectorize.add_string_to_store(message.body, faiss_index)
+            print("Success")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print("Failed to add the message to the index.")
+    
+    context = {"user": request.user.username}
+    return render(request, "base/journal.html", context=context)
 
 @login_required(login_url='login')
 def chatManager(request, username):
