@@ -38,7 +38,7 @@
     <!-- Message input form -->
     <form id="message-form" method="post" action="{% url 'chat-send-message' chat_id=conversation.chat_id %}">
         {% csrf_token %}
-        <textarea name="message" id="message-input" rows="3" placeholder="Type your message here..."></textarea>
+        <input type="text" name="message" id="message-input" rows="3" placeholder="Type your message here..."></>
         <button type="submit">Send</button>
     </form>
 </div>
