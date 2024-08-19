@@ -7,7 +7,8 @@
 </head>
 
 <div id="chat-container">
-    <div>Chat ID: {{ conversation.chat_id }}</div>
+    <!-- Not sure if this will be needed later. Leaving it for now. 2024-08-19 -->
+    <!-- <div>Chat ID: {{ conversation.chat_id }}</div> -->
 
     <!-- Display messages -->
     <div id="messages">
@@ -30,11 +31,6 @@
         {% endif %}
     </div>
 
-    <!-- <form method="post">
-        {% csrf_token %}
-        <input type="text" name="message" placeholder="Type your message here...">
-        <button type="submit" value="Send" id="send-btn">Send</button>
-    </form> -->
     <!-- Message input form -->
     <form id="message-form" method="post" action="{% url 'chat-send-message' chat_id=conversation.chat_id %}">
         {% csrf_token %}
