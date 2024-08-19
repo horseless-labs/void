@@ -10,9 +10,14 @@ class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
-    def initialize_chat(self, username=None):
+    def initialize_chat(self, username=None, chat_id=None):
         self.base_messages = chat_session.initialize_chat_session()
+        # if chat_id == None:
+        #     self.chat_id = chat_session.generate_chat_id()
+        # else:
+        #     self.chat_id = chat_id
         self.chat_id = chat_session.generate_chat_id()
+
         self.save()
 
         for message_data in self.base_messages:

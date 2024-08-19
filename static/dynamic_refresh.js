@@ -1,65 +1,65 @@
-// Does away with the need to reload the page when messages have been submitted
+document.addEventListener("DOMContentLoaded", function () {
+    const computerName = window.computerName;
+    const userName = window.userName;
+    const sourceName = window.sourceName;
+    const chat_id = window.chat_id;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-var computerName = window.computerName;
-var userName = window.userName;
-var sourceName = window.sourceName;
-var chat_id = window.chat_id;
-var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-console.log(`The sourceName is ${sourceName}`)
-console.log(`The user is ${userName}`);
+    const form = document.querySelector("form");
+    const inputBox = document.querySelector("input[name='message']");
+    const chatContainer = document.getElementById("chat-container");
 
-const form = document.querySelector("form")
-// const form = document.getElementById("message-form")
-const inputBox = document.querySelector("input[name='message']")
-// const inputBox = document.getElementById("message-input")
-const chatContainer = document.getElementById("chat-container")
-const submitButton = document.getElementById("send-btn")
-// const submitButton = form.querySelector("button[type='submit'")
-console.log("Hello from this script")
+    // Function to scroll the chat container to the bottom
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-// Add event listener to the form
-submitButton.addEventListener("click", (event) => {
-    console.log("button clicked")
-    event.preventDefault();
+    // Add event listener to the form
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();  // Prevent the default form submission behavior
 
-    const message = inputBox.value;
-    console.log(message)
-    console.log("Form submitted");
+        const message = inputBox.value.trim();
+        if (!message) return;
 
-    fetch(`/${sourceName}-send-message/${chat_id}`, {
-        method: "POST",
-        body: JSON.stringify({ content: message }),
-        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data);
-        // Could be neater, but whatever. 
-        const messageElement = document.createElement("div");
-        messageElement.className = data.role === "user" ? "message-user" : "message-computer";
-        messageElement.innerText = `${data.role === "user" ? userName + ": " : computerName + ": "}${data.content}`;
-        chatContainer.appendChild(messageElement);
-    })    
-    .then(() => {
-        return fetch(`/${sourceName}-send-response/${chat_id}`, {
+        // Clear the input field immediately
+        inputBox.value = '';
+
+        // Display user message instantly
+        const userMessageElement = document.createElement("div");
+        userMessageElement.className = "message-user";
+        userMessageElement.innerText = `${userName}: ${message}`;
+        chatContainer.appendChild(userMessageElement);
+        scrollToBottom();  // Scroll to the bottom right after adding the message
+
+        // Send user message to the server
+        fetch(`/${sourceName}-send-message/${chat_id}`, {
             method: "POST",
             body: JSON.stringify({ content: message }),
-            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
+            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
         })
-    })
-    .then ((response) => {
-        return response.json();
-    })
-    .then ((data) => {
-        const messageElement = document.createElement("div");
-        messageElement.className = data.role === "user" ? "message-user" : "message-computer";
-        messageElement.innerText = `${data.role === "user" ? userName + ": " : computerName + ": "}${data[0].content}`;
-        chatContainer.appendChild(messageElement);
-    })
-    .catch((error) => {
-        console.error(error)
-    })
+        .then(response => response.json())
+        .then(data => {
+            // Send bot response
+            return fetch(`/${sourceName}-send-response/${chat_id}`, {
+                method: "POST",
+                body: JSON.stringify({ content: message }),
+                headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display bot response
+            const botMessageElement = document.createElement("div");
+            botMessageElement.className = "message-computer";
+            botMessageElement.innerText = `${computerName}: ${data[0].content}`;
+            chatContainer.appendChild(botMessageElement);
 
-    // Clear the input field
-    inputBox.value = ''
+            // Scroll to the bottom after adding the bot message
+            scrollToBottom();
+        })
+        .catch(error => console.error(error));
+    });
+
+    // Ensure the chat container is always scrolled to the bottom on load
+    scrollToBottom();
 });

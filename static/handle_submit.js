@@ -1,37 +1,62 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('message-form');
-    const textarea = document.getElementById('message-input');
+$(document).ready(function() {
+    const computerName = window.computerName || 'Computer';
+    const userName = window.userName || 'User';
+    const chat_id = window.chat_id || 'default_chat_id';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        const formData = new FormData(form);
+    $('#message-form').on('submit', function(event) {
+        event.preventDefault();
 
-        // Clear the textarea immediately
-        textarea.value = '';
+        var messageInput = $('#message-input');
+        var messageText = messageInput.val().trim();
 
-        // Submit the form using Fetch API
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response if needed
-            console.log('Success:', data);
-        })
-        .catch(error => {
-            // Handle errors if needed
-            console.error('Error:', error);
-        });
-    });
-
-    textarea.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent the default action of adding a new line
-            form.requestSubmit(); // Trigger form submission programmatically
+        if (messageText === '') {
+            return;
         }
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: {
+                'message': messageText,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(userResponse) {
+                $('#messages').append(
+                    `<div class="message-user">
+                        ${userName}: ${messageText} <span class="timestamp">${new Date().toLocaleString()}</span>
+                    </div>`
+                );
+
+                messageInput.val('');
+                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+
+                $.ajax({
+                    url: `/chat-send-response/${chat_id}/`,
+                    type: 'POST',
+                    data: {
+                        'message': messageText,
+                        'csrfmiddlewaretoken': csrfToken
+                    },
+                    success: function(botResponse) {
+                        $('#messages').append(
+                            `<div class="message-computer">
+                                ${computerName}: ${botResponse.content.output} <span class="timestamp">${botResponse.timestamp}</span>
+                            </div>`
+                        );
+
+                        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Bot response failed:', error);
+                        console.log('Response:', xhr.responseText);
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Message submission failed:', error);
+                console.log('Response:', xhr.responseText);
+            }
+        });
     });
 });

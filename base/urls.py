@@ -10,10 +10,10 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('chat/<str:chat_id>', views.chat, name="chat"),
     path('chat-send-message/<str:chat_id>', views.chatSendMessage, name="chat-send-message"),
-    path('chat-send-response/<str:chat_id>', views.chatSendResponse, name="chat-send-response"),
+    path('chat-send-response/<str:chat_id>/', views.chatSendResponse, name="chat-send-response"),
 
     path('journal/<str:username>', views.journal, name='journal'),
-    path('send-journal-entry/<str:username>', views.sendJournal, name="send-journal-entry"),
+    path('send-journal-entry/<str:chat_id>', views.sendJournal, name="send-journal-entry"),
 
     path('chat-manager/<str:username>', views.chatManager, name="chat-manager"),
     path('create-new-chat/<str:username>', views.createNewChat, name="create-new-chat"),

@@ -161,6 +161,15 @@ form button:hover {
 }
 
 /* General Styles for the Chat Form */
+#chat-container {
+    max-width: 800px; /* Set a max width for the chat container */
+    margin: 0 auto; /* Center the entire chat container */
+    padding: 20px; /* Add some padding around the chat area */
+    background-color: #fff; /* Set a background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
+    border-radius: 10px; /* Optional: Round the corners */
+}
+
 #message-form {
     display: flex; /* Align input and button in a row */
     align-items: center; /* Vertically center align input and button */

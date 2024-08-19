@@ -97,6 +97,10 @@ def updateUser(request):
 @login_required(login_url='login')
 def chat(request, chat_id):
     conversation = Conversation.objects.get(chat_id=chat_id)
+    print(f"chat_id: {chat_id}")
+    print(f"conversation is {conversation}")
+    print(f"conversation.user.username is {conversation.user.username}")
+    print(f"request.user.username is {request.user.username}")
 
     if conversation.user.username != request.user.username:
         print(conversation.user_id)
@@ -114,18 +118,23 @@ def chat(request, chat_id):
 @login_required(login_url='login')
 def journal(request, username):
     user = User.objects.get(username=username)
-    # conversation = Conversation.objects.create(user=user)
-    # conversation.initialize_chat(username=username)
-    context = {"username": username}
+    conversation = Conversation.objects.create(user=user)
+
+    conversation.initialize_chat(username=username)
+    context = {"chat_id": conversation.chat_id}
     return render(request, "base/journal.html", context=context)
 
 @csrf_exempt
-def sendJournal(request, username):
+def sendJournal(request, chat_id):
     if request.method == "POST":
         journal_entry = request.POST.get("journal_entry", "").strip()
         print(journal_entry)
         
-        user = User.objects.get(username=request.user)
+        # chat_id = chat_session.generate_chat_id()
+        conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
+
+        username = conversation.user.username
+        user = User.objects.get(username=username)
 
         # Currently saving Journals the same way as Messages.
         # Might change later.
@@ -133,7 +142,7 @@ def sendJournal(request, username):
             user=user,
             # In this implementation, a journal entry also has a unique chat id
             # This will make it visible in the Chat Manager
-            chat_id=chat_session.generate_chat_id(),
+            chat_id=chat_id,
             role="user",
             body=journal_entry
         )
@@ -150,9 +159,9 @@ def sendJournal(request, username):
             print(f"An error occurred: {e}")
             print("Failed to add the message to the index.")
     
-    context = {"user": request.user.username}
+        context = {"user": request.user.username}
     # return render(request, "base/journal.html", context=context)
-    return redirect('journal', username=username)
+    return redirect('journal', username=request.user.username)
 
 # A page where the user can query their own documents.
 # Unsure if this will make it into the final implementation.
@@ -224,7 +233,7 @@ def chatSendMessage(request, chat_id):
             chat_id=chat_id,
             role="user",
             body=user_message
-        )
+        )   
         print(message)
         message.save()
 
@@ -247,7 +256,8 @@ def chatSendMessage(request, chat_id):
         # Stores the most recent message from the user in the Django session
         request.session["mr_human_message"] = user_message
         
-        return redirect('chat-send-response', chat_id=chat_id)
+        # return redirect('chat-send-response', chat_id=chat_id)
+        return JsonResponse(response_data)
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
 # Handles the agent's reply
@@ -281,7 +291,9 @@ def chatSendResponse(request, chat_id):
     response_data = {
         "user": user.username,
         "content": agent_message,
-        "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S")
+        "timestamp": message.created.strftime("%Y-%m-%d %H:%M:%S"),
+        "chat_id": chat_id
     }
     
-    return redirect("chat", chat_id=chat_id)
+    # return redirect("chat", chat_id=chat_id)
+    return JsonResponse(response_data)
