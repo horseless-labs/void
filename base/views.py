@@ -113,6 +113,14 @@ def chat(request, chat_id):
 
 @login_required(login_url='login')
 def journal(request, username):
+    user = User.objects.get(username=username)
+    # conversation = Conversation.objects.create(user=user)
+    # conversation.initialize_chat(username=username)
+    context = {"username": username}
+    return render(request, "base/journal.html", context=context)
+
+@csrf_exempt
+def sendJournal(request, username):
     if request.method == "POST":
         journal_entry = request.POST.get("journal_entry", "").strip()
         print(journal_entry)
@@ -143,7 +151,8 @@ def journal(request, username):
             print("Failed to add the message to the index.")
     
     context = {"user": request.user.username}
-    return render(request, "base/journal.html", context=context)
+    # return render(request, "base/journal.html", context=context)
+    return redirect('journal', username=username)
 
 # A page where the user can query their own documents.
 # Unsure if this will make it into the final implementation.

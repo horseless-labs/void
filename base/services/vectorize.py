@@ -121,7 +121,7 @@ def ask_store(query, db_path="./faiss_index"):
     with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
     
-    llm = ChatOpenAI(api_key=key)
+    llm = ChatOpenAI(api_key=key, temperature=0.0)
     vector_store = open_faiss_index(db_path)
     retriever = vector_store.as_retriever()
     prompt = hub.pull("rlm/rag-prompt")

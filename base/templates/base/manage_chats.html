@@ -16,5 +16,17 @@
         <input type="hidden" name="username" value="{{ user.username }}">
         <button type="submit" class="btn btn-primary">New Chat</button>
     </form>
+    <form method="post" action="{% url 'journal' username=user.username %}">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <input type="hidden" name="username" value="{{ user.username }}">
+        <button type="submit" class="btn btn-primary">New Journal</button>
+    </form>
+    <form method="post" action="{% url 'ask' username=user.username %}">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <input type="hidden" name="username" value="{{ user.username }}">
+        <button type="submit" class="btn btn-primary">Query Your History</button>
+    </form>
 </div>
 {% endblock %}
