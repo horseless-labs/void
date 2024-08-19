@@ -14,7 +14,10 @@ $(document).ready(function() {
             return;
         }
 
+        // Perform AJAX request to submit the user's message
         $.ajax({
+            // The URL where the form data should be sent, defined in the form's action attribute
+            // In this case, it's chat-send-message
             url: $(this).attr('action'),
             type: 'POST',
             data: {
@@ -28,24 +31,26 @@ $(document).ready(function() {
                     </div>`
                 );
 
-                messageInput.val('');
-                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                messageInput.val(''); // Clear the message field
+                $('#messages').scrollTo($('#messages')[0].scrollHeight); // Scroll to the bottom of the chat window (broken)
 
+                // Perform AJAX request to get a response from the agent
                 $.ajax({
-                    url: `/chat-send-response/${chat_id}/`,
+                    url: `/chat-send-response/${chat_id}/`, // URL to send the message and get the agent's response
                     type: 'POST',
                     data: {
                         'message': messageText,
                         'csrfmiddlewaretoken': csrfToken
                     },
                     success: function(botResponse) {
+                        // Append the bot's message to the chat window
                         $('#messages').append(
                             `<div class="message-computer">
                                 ${computerName}: ${botResponse.content.output} <span class="timestamp">${botResponse.timestamp}</span>
                             </div>`
                         );
 
-                        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                        $('#messages').scrollTo($('#messages')[0].scrollHeight); // Scroll tot he bottom of the chat window
                     },
                     error: function(xhr, status, error) {
                         console.error('Bot response failed:', error);

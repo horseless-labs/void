@@ -21,8 +21,6 @@ from .forms import UserForm
 from .services import agent_spec, vectorize, chat_session
 from .models import Message, Conversation
 
-# TODO: get rid of this when development is done
-
 def home(request):
     user = request.user
     
@@ -93,28 +91,6 @@ def updateUser(request):
     
     return render(request, "base/update-user.html", {"form": form})
 
-# Base chat interface. Starts here, then routes to chatSendMessage() and chatSendResponse()
-@login_required(login_url='login')
-def chat(request, chat_id):
-    conversation = Conversation.objects.get(chat_id=chat_id)
-    print(f"chat_id: {chat_id}")
-    print(f"conversation is {conversation}")
-    print(f"conversation.user.username is {conversation.user.username}")
-    print(f"request.user.username is {request.user.username}")
-
-    if conversation.user.username != request.user.username:
-        print(conversation.user_id)
-        print(request.user.username)
-        return render(request, "base/403.html")
-
-    messages = Message.objects.filter(chat_id=chat_id).order_by('created')
-
-    context = {"username": request.user.username,
-               "conversation": conversation,
-               "messages": messages,
-               "chat_id": chat_id}
-    return render(request, "base/chat.html", context=context)
-
 @login_required(login_url='login')
 def journal(request, username):
     user = User.objects.get(username=username)
@@ -138,6 +114,7 @@ def sendJournal(request, chat_id):
 
         # Currently saving Journals the same way as Messages.
         # Might change later.
+        # This way does allow a user to discuss single documents in the same way as the rest of their chats.
         message = Message.objects.create(
             user=user,
             # In this implementation, a journal entry also has a unique chat id
@@ -147,7 +124,6 @@ def sendJournal(request, chat_id):
             body=journal_entry
         )
 
-        print(message)
         message.save()
 
         try:
@@ -191,12 +167,32 @@ def sendFaissQuery(request, username):
 def sendFaissResponse(request, username):
     ask_convo = request.session.get("ask_convo")
     faiss_index = f"base/indices/{username}_faiss_index"
+
+    # Uses ask_store(), the LLM version of search for FAISS here.
+    # query_store() acts as a more raw search engine
     response = vectorize.ask_store(ask_convo[-1]["content"], faiss_index)
 
     ask_convo.append({"role": "agent", "content": response})
     request.session["ask_convo"] = ask_convo
-    print(ask_convo)
     return redirect("ask", username=username)
+
+# Base chat interface. Starts here, then routes to chatSendMessage() and chatSendResponse()
+@login_required(login_url='login')
+def chat(request, chat_id):
+    conversation = Conversation.objects.get(chat_id=chat_id)
+
+    if conversation.user.username != request.user.username:
+        print(conversation.user_id)
+        print(request.user.username)
+        return render(request, "base/403.html")
+
+    messages = Message.objects.filter(chat_id=chat_id).order_by('created')
+
+    context = {"username": request.user.username,
+               "conversation": conversation,
+               "messages": messages,
+               "chat_id": chat_id}
+    return render(request, "base/chat.html", context=context)
 
 # View that shows the viewer a list of their chats.
 @login_required(login_url='login')
@@ -207,15 +203,18 @@ def chatManager(request, username):
     user = User.objects.get(username=username)
     chat_ids = Message.objects.filter(user=user).distinct().values_list("chat_id", flat=True)
     context = {"user": user, "chat_ids": chat_ids}
+
     return render(request, "base/manage_chats.html", context=context)
 
+# This is referred to in base/manage_chats.html
+# It only feels redundant. Grab a coffee.
 @login_required(login_url='login')
 def createNewChat(request, username):
     user = User.objects.get(username=username)
+
     conversation = Conversation.objects.create(
         user=user,
     )
-    print(f"conversation.user: {conversation.user}")
     conversation.initialize_chat(username=username)
     return redirect("chat", chat_id=conversation.chat_id)
 
@@ -234,14 +233,12 @@ def chatSendMessage(request, chat_id):
             role="user",
             body=user_message
         )   
-        print(message)
+
         message.save()
 
         try:
             faiss_index = f"base/indices/{request.user.username}_faiss_index"
-            print(f"Attempting to add the message {message.body} to {faiss_index}")
             vectorize.add_string_to_store(message.body, faiss_index)
-            print("Success")
         except Exception as e:
             print(f"An error occurred: {e}")
             print("Failed to add the message to the index.")
@@ -253,6 +250,7 @@ def chatSendMessage(request, chat_id):
             "chat_id": conversation.chat_id
         }
 
+        # TODO: review code to determine if this is redundant. There is also one in chatSendResponse()
         # Stores the most recent message from the user in the Django session
         request.session["mr_human_message"] = user_message
         
@@ -267,7 +265,6 @@ def chatSendResponse(request, chat_id):
     agent = agent_spec.init_agent(chat_id)
     agent_message = agent_spec.get_agent_output(agent, message, chat_id)
 
-    conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
     user = User.objects.get(username=request.user)
 
     message = Message.objects.create(
@@ -276,14 +273,12 @@ def chatSendResponse(request, chat_id):
         role="agent",
         body=agent_message["output"]
     )
-    print(message)
+
     message.save()
 
     try:
         faiss_index = f"base/indices/{request.user.username}_faiss_index"
-        print(f"Attempting to add the message {message.body} to the {faiss_index}")
         vectorize.add_string_to_store(agent_message["output"], faiss_index)
-        print("Success")
     except Exception as e:
         print(f"An error occurred: {e}")
         print("Failed to add the message to the index.")
@@ -295,5 +290,4 @@ def chatSendResponse(request, chat_id):
         "chat_id": chat_id
     }
     
-    # return redirect("chat", chat_id=chat_id)
     return JsonResponse(response_data)

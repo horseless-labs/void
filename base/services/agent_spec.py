@@ -16,13 +16,12 @@ from langchain_core.messages import AIMessage, HumanMessage
 from .vectorize import open_faiss_index
 from ..models import Message
 
+# TODO: Find a neater way to define these, and maybe a better place to put them.
 test_system_message = """Begin!
 
 {chat_history}
 Prompt: {input}
 {agent_scratchpad}"""
-
-
 
 PROMPT = PromptTemplate(
     input_variables=["input", "chat_history", "agent_scratchpad"],
@@ -30,10 +29,7 @@ PROMPT = PromptTemplate(
 )
 
 llm = ChatOpenAI(temperature=0.5)
-# llm_chain = LLMChain(llm=llm, prompt=PROMPT)
 llm_chain = PROMPT | llm
-
-# memory = ConversationBufferMemory(memory_key="chat_history", input_key="input", return_messages=True)
 
 wiki = WikipediaAPIWrapper()
 
@@ -57,27 +53,6 @@ tools = [
     )
 ]
 
-system = '''Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}'''
-
-# prompt = PromptTemplate.from_template(system)
 prompt = hub.pull("hwchase17/structured-chat-agent")
 
 def load_chats(chat_id):
@@ -85,18 +60,13 @@ def load_chats(chat_id):
     return list(messages)
 
 def init_agent(chat_id):
-    prefix = test_system_message
-    suffix = test_system_message
-
     with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
     chat = ChatOpenAI(api_key=key, temperature=0.5)
 
-    llm_chain = prompt | chat
     agent = create_structured_chat_agent(llm=chat, tools=tools, prompt=prompt)
     agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
     
-    # TODO: figure out how the session stuff will actually work.
     memory = ChatMessageHistory(session_id="test-session")
     chats = load_chats(chat_id)
 
@@ -123,9 +93,3 @@ def get_agent_output(agent, human_message, chat_id):
     )
 
     return result
-
-if __name__ == '__main__':
-    agent = init_agent()
-    human_message = "What is the weather like in Cleveland, OH right now?"
-    result = get_agent_output(agent, human_message, "test-session")
-    print(result["output"])

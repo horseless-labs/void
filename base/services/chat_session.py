@@ -9,7 +9,6 @@ def generate_chat_id(length=64):
     return chat_id
 
 # TODO: replace with real messages
-# Prototype to make sure chat turn-taking works.
 def initialize_chat_session():
     base_messages = [
         {"role": "system", "content": "You are a helpful assistant" },
@@ -26,7 +25,9 @@ def save_message(chat_id, user_id, username, message, timestamp, tokens_cb=None)
         "timestamp": timestamp,
     }
 
+    # TODO: Add these to Messages
     # Will only be added to the agent's messages
+    # Null otherwise
     if tokens_cb != None:
         chat_message["user_id"] = "agent" # TODO: think if this is a good way of doing this
         chat_message["total_tokens"] = tokens_cb.total_tokens

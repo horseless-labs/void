@@ -62,13 +62,13 @@ def open_faiss_index(db_path):
     vector_store = FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
     return vector_store
 
+# TODO: consider renaming this. It is only referrenced to create the index on
+# the user registration page. open_faiss_index() is used everywhere else.
 def open_or_create_faiss_index(username):
-    with open("base/services/openai_api_key.txt", "r") as file:
-        key = file.read().strip()
-    
     db_path = f"base/indices/{username}_faiss_index"
     init_faiss(db_path)
 
+# TODO: Determine if this is redundant. Journal is current just using add_string_to_store()
 # `doc` here is the path to a plaintext document
 # This function or a version of it will come into play in the implementation
 # of Journal Mode
@@ -85,7 +85,6 @@ def add_doc_to_store(doc, db_path="./faiss_index"):
     documents = [Document(page_content=x) for x in splits]
 
     vector_store = open_faiss_index(db_path)
-
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
 
@@ -96,6 +95,7 @@ def add_string_to_store(chat_string, db_path="./faiss_index"):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=25)
     splits = text_splitter.split_text(chat_string)
     documents = [Document(page_content=x) for x in splits]
+
     print(f"From vectorize.py, add_string_to_store.\nSplits: {splits}\ndocuments: {documents}")
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
@@ -121,9 +121,16 @@ def ask_store(query, db_path="./faiss_index"):
     with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
     
+    # TODO: Experiment with different temperatures.
+    # The default in BaseChatOpenAI is 0.7. This produced hallucinations when
+    # queried on a very small amount of vectorized data. (Seriously, just
+    # stuff like "Just testing" and "How much coffee is safe to drink?")
     llm = ChatOpenAI(api_key=key, temperature=0.0)
     vector_store = open_faiss_index(db_path)
     retriever = vector_store.as_retriever()
+
+    # The text of this prompt can be found in a playground here:
+    # https://smith.langchain.com/hub/rlm/rag-prompt/playground
     prompt = hub.pull("rlm/rag-prompt")
 
     rag_chain = (
@@ -135,6 +142,3 @@ def ask_store(query, db_path="./faiss_index"):
 
     output = rag_chain.invoke(query)
     return output
-
-# if __name__ == '__main__':
-#     init_faiss()
