@@ -1,10 +1,15 @@
 import faiss
 
+from langchain import hub
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
+
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
 
 from langchain_community.document_loaders import TextLoader
 # from langchain.schema import Document
@@ -96,6 +101,7 @@ def add_string_to_store(chat_string, db_path="./faiss_index"):
     vector_store.save_local(db_path)
 
 # Makes a query to the given vector store.
+# This one is more akin to a search engine.
 def query_store(query, db_path="./faiss_index"):
     vector_store = open_faiss_index(db_path)
     results = vector_store.similarity_search_with_score(query=query)
@@ -104,6 +110,30 @@ def query_store(query, db_path="./faiss_index"):
     for doc, score in results:
         output += f"* {doc.page_content} [{doc.metadata}], score: {score}\n"
 
+    return output
+
+# Helper function for ask_store()
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+# Uses an LLM to ask questions about the contents of a vector store.
+def ask_store(query, db_path="./faiss_index"):
+    with open("base/services/openai_api_key.txt", "r") as file:
+        key = file.read().strip()
+    
+    llm = ChatOpenAI(api_key=key)
+    vector_store = open_faiss_index(db_path)
+    retriever = vector_store.as_retriever()
+    prompt = hub.pull("rlm/rag-prompt")
+
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough() }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    output = rag_chain.invoke(query)
     return output
 
 # if __name__ == '__main__':

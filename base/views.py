@@ -67,6 +67,8 @@ def registerPage(request):
             user.username = user.username.lower()
             user.save()
             login(request, user)
+
+            # Creates a FAISS index unique to the user.
             vectorize.open_or_create_faiss_index(user.username)
             return redirect('home')
         else:
@@ -91,6 +93,7 @@ def updateUser(request):
     
     return render(request, "base/update-user.html", {"form": form})
 
+# Base chat interface. Starts here, then routes to chatSendMessage() and chatSendResponse()
 @login_required(login_url='login')
 def chat(request, chat_id):
     conversation = Conversation.objects.get(chat_id=chat_id)
@@ -142,6 +145,42 @@ def journal(request, username):
     context = {"user": request.user.username}
     return render(request, "base/journal.html", context=context)
 
+# A page where the user can query their own documents.
+# Unsure if this will make it into the final implementation.
+# It is here for testing purposes.
+@login_required(login_url='login')
+def ask(request, username):
+    user = User.objects.get(username=username)
+
+    # Query of the index will not be persisted; it is easier to
+    # store this in the session.
+    ask_convo = request.session.get("ask_convo", [])
+    context = {"user": user, "conversation": ask_convo}
+    return render(request, "base/query_chats.html", context=context)
+
+@csrf_exempt
+def sendFaissQuery(request, username):
+    if request.method == 'POST':
+        user_query = request.POST.get("message").strip()
+        ask_convo = request.session.get("ask_convo", [])
+        ask_convo.append({"role": "user", "content": user_query})
+
+        request.session["ask_convo"] = ask_convo
+        return redirect('send-faiss-response', username=username)
+    return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+
+@csrf_exempt
+def sendFaissResponse(request, username):
+    ask_convo = request.session.get("ask_convo")
+    faiss_index = f"base/indices/{username}_faiss_index"
+    response = vectorize.ask_store(ask_convo[-1]["content"], faiss_index)
+
+    ask_convo.append({"role": "agent", "content": response})
+    request.session["ask_convo"] = ask_convo
+    print(ask_convo)
+    return redirect("ask", username=username)
+
+# View that shows the viewer a list of their chats.
 @login_required(login_url='login')
 def chatManager(request, username):
     if request.user.username != username:

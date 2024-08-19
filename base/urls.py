@@ -15,5 +15,9 @@ urlpatterns = [
     path('submit-journal-entry/<str:username>', views.journal, name="submit-journal-entry"),
 
     path('chat-manager/<str:username>', views.chatManager, name="chat-manager"),
-    path('create-new-chat/<str:username>', views.createNewChat, name="create-new-chat")
+    path('create-new-chat/<str:username>', views.createNewChat, name="create-new-chat"),
+
+    path('ask/<str:username>', views.ask, name='ask'),
+    path('send-faiss-query/<str:username>', views.sendFaissQuery, name="send-faiss-query"),
+    path('send-faiss-response/<str:username>', views.sendFaissResponse, name="send-faiss-response")
 ]

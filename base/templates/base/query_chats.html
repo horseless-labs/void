@@ -1,0 +1,48 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<div id="ask-container">
+    <!-- Display messages -->
+    <div id="messages">
+        {% if not forloop.first %}
+            {% for message in conversation %}
+                {% if not forloop.first %}
+                    {% if message.role == 'user' %}
+                        <div class="message-user">
+                            {{ user.username }}: {{ message.content }}
+                        </div>
+                    {% else %}
+                        <div class="message-computer">
+                            Query Agent: {{ message.content }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Message input form -->
+    <form id="message-form" method="post" action="{% url 'send-faiss-query' username=user.username %}">
+        {% csrf_token %}
+        <input type="text" name="message" id="message-input" rows="3" placeholder="Type your message here..."></>
+        <button type="submit">Send</button>
+    </form>
+</div>
+
+<script>
+    // Define global variables
+    // TODO: double-check that this is an okay thing to do. Feels sloppy :/
+    window.computerName = "Query Agent";
+    window.userName = "{{ request.user.username }}";
+    window.role = "{{ message.role }}"
+    window.sourceName = "chat";
+    window.chat_id = "{{ chat_id }}"
+</script>
+<script src="{% static 'dynamic_refresh.js' %}"></script>
+<!-- <script src="{% static 'handle_submit.js' %}"></script> -->
+{% endblock %}
