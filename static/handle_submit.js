@@ -4,6 +4,22 @@ $(document).ready(function() {
     const chat_id = window.chat_id || 'default_chat_id';
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    function scrollToBottom() {
+        const messagesContainer = $('#messages');
+        messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
+    }
+    
+    // Attempt to scroll to the bottom on page load
+    function tryScrollOnLoad() {
+        setTimeout(() => {
+            scrollToBottom();
+            console.log('Scrolled to the bottom on page load');
+        }, 100); // Adjust delay if needed
+    }
+
+    // Scroll to bottom on page load
+    tryScrollOnLoad();
+
     $('#message-form').on('submit', function(event) {
         event.preventDefault();
 
@@ -29,7 +45,7 @@ $(document).ready(function() {
                 );
 
                 messageInput.val('');
-                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                scrollToBottom();
 
                 $.ajax({
                     url: `/chat-send-response/${chat_id}/`,
@@ -45,7 +61,7 @@ $(document).ready(function() {
                             </div>`
                         );
 
-                        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                        scrollToBottom();
                     },
                     error: function(xhr, status, error) {
                         console.error('Bot response failed:', error);

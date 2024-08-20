@@ -162,6 +162,9 @@ form button:hover {
 
 /* General Styles for the Chat Form */
 #chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh
     max-width: 800px; /* Set a max width for the chat container */
     margin: 0 auto; /* Center the entire chat container */
     padding: 20px; /* Add some padding around the chat area */
@@ -202,6 +205,12 @@ form button:hover {
 /* Button Hover Effect */
 #message-form button:hover {
     background-color: #0056b3; /* Darker button color on hover */
+    margin-top: auto;
+}
+
+#messages {
+    height: 600px; /* Adjust height as needed */
+    overflow-y: auto;
 }
 
 .message-user,
