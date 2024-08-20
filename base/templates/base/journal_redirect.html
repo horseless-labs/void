@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<p>{{ chat_id }}</p>
+<p>Would you like to discuss this immediately, or go back to the Chat Manager?</p>
+<!-- Form for redirecting to the chat view -->
+<form method="get" action="{% url 'chat-manager' username=username %}">
+    <button type="submit" id="chat-manager-btn">Go to Chat Manager</button>
+</form>
+
+<form method="get" action="{% url 'chat' chat_id=chat_id %}">
+    <button type="submit" id="discuss-btn">Discuss it Now</button>
+</form>
+
+{% endblock %}

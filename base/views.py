@@ -106,7 +106,6 @@ def sendJournal(request, chat_id):
         journal_entry = request.POST.get("journal_entry", "").strip()
         print(journal_entry)
         
-        # chat_id = chat_session.generate_chat_id()
         conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
 
         username = conversation.user.username
@@ -128,16 +127,20 @@ def sendJournal(request, chat_id):
 
         try:
             faiss_index = f"base/indices/{request.user.username}_faiss_index"
-            print(f"Attempting to add the message {message.body} to {faiss_index}")
             vectorize.add_string_to_store(message.body, faiss_index)
-            print("Success")
         except Exception as e:
             print(f"An error occurred: {e}")
             print("Failed to add the message to the index.")
     
         context = {"user": request.user.username}
-    # return render(request, "base/journal.html", context=context)
-    return redirect('journal', username=request.user.username)
+    # return redirect('journal', username=request.user.username)
+    return redirect('redirect-journal', chat_id=chat_id)
+
+@csrf_exempt
+def redirectJournalOrChatManager(request, chat_id):
+    context = {"chat_id": chat_id,
+               "username": request.user.username}
+    return render(request, "base/journal_redirect.html", context=context)
 
 # A page where the user can query their own documents.
 # Unsure if this will make it into the final implementation.
