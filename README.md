@@ -19,5 +19,7 @@ Void is an experiment in using retrieval-augmented generation (RAG) to give peop
 - [ ] Fix user access restriction hole around query_chats.html
 
 # Open Questions
+**Conformation to User Speech**
+This got started with thinking about slang. How well could an LLM take annotations about the manner in which a person uses text? For instance, could it notice that a user tends to use shorter sentences when in a worse mood, then adjust its own prompts to behave accordingly? In keeping with the idea of parasocial relationship avoidance, the LLM could store annotations like this in a vector store, and the heavier usage of this would use more tokens. A user is always drawing from something like a **token budget**.
 
 # Resources
