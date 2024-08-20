@@ -164,7 +164,7 @@ form button:hover {
 #chat-container {
     display: flex;
     flex-direction: column;
-    height: 100vh
+    height: 100vh;
     max-width: 800px; /* Set a max width for the chat container */
     margin: 0 auto; /* Center the entire chat container */
     padding: 20px; /* Add some padding around the chat area */
@@ -264,6 +264,19 @@ form button:hover {
     font-size: 1.1em;
     line-height: 1.5;
     resize: vertical;
+}
+
+/* Styling for the button container */
+.button-container {
+    display: flex; /* Use flexbox to arrange items in a row */
+    gap: 10px; /* Add space between buttons (adjust as needed) */
+    margin-bottom: 20px; /* Optional: Add some space below the container */
+    margin: 0 auto;
+}
+
+/* Ensure form elements do not stretch */
+.button-container form {
+    margin: 0; /* Remove default margin from forms */
 }
 
 #submit-btn {
