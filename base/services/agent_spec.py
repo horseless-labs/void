@@ -78,16 +78,19 @@ class OpenAITokenAsyncHandler(AsyncCallbackHandler):
     ) -> None:
         encoding = tiktoken.get_encoding("cl100k_base")
         prompts_string = ''.join(prompts)
-        num_tokens = len(encoding.encode(prompts_string))
-        print("NUM TOKENS: ", num_tokens)
+        self.num_tokens = len(encoding.encode(prompts_string))
+        print("NUM TOKENS: ", self.num_tokens)
 
 
     async def on_llm_end(self, response, **kwargs) -> None:
         """Run when chain ends running."""
         text_response = response.generations[0][0].text
         encoding = tiktoken.get_encoding("cl100k_base")
-        response_string = len(encoding.encode(text_response))
-        print("NUM TOKENS RESPONSE: ", response_string)
+        self.response_string = len(encoding.encode(text_response))
+        print("NUM TOKENS RESPONSE: ", self.response_string)
+
+    def get_tokens_info(self):
+        return self.num_tokens, self.response_string
 
 def load_chats(chat_id):
     messages = Message.objects.filter(chat_id=chat_id).order_by('created')
@@ -96,9 +99,12 @@ def load_chats(chat_id):
 def init_agent(chat_id):
     with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
+
+    tt_cb = OpenAITokenAsyncHandler()
+
     chat = ChatOpenAI(api_key=key,
                       temperature=0.5,
-                      callbacks=[OpenAITokenAsyncHandler()]
+                      callbacks=[tt_cb]
                       )
 
     agent = create_structured_chat_agent(llm=chat, tools=tools, prompt=prompt)
@@ -121,7 +127,7 @@ def init_agent(chat_id):
         history_messages_key="chat_history",
     )
 
-    return agent_with_chat_history
+    return agent_with_chat_history, tt_cb
 
 async def get_agent_output(agent, human_message, chat_id):
     agent_response = await agent.ainvoke(

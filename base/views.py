@@ -266,10 +266,10 @@ def chatSendMessage(request, chat_id):
 @csrf_exempt
 def chatSendResponse(request, chat_id):
     message = request.session["mr_human_message"]
-    agent = agent_spec.init_agent(chat_id)
+    agent, tt_cb = agent_spec.init_agent(chat_id)
     # agent_message = await agent_spec.get_agent_output(agent, message, chat_id)
     agent_message = asyncio.run(agent_spec.get_agent_output(agent, message, chat_id))
-    print(agent_message)
+    print(f"tt_cb from chatSendResponse(): {tt_cb.get_tokens_info()}")
 
     user = User.objects.get(username=request.user)
 
