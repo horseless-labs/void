@@ -96,7 +96,7 @@ def add_string_to_store(chat_string, db_path="./faiss_index"):
     splits = text_splitter.split_text(chat_string)
     documents = [Document(page_content=x) for x in splits]
 
-    print(f"From vectorize.py, add_string_to_store.\nSplits: {splits}\ndocuments: {documents}")
+    # print(f"From vectorize.py, add_string_to_store.\nSplits: {splits}\ndocuments: {documents}")
     vector_store.add_documents(documents)
     vector_store.save_local(db_path)
 

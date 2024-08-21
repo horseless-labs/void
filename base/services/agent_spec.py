@@ -13,6 +13,13 @@ from langchain_community.tools import DuckDuckGoSearchRun, DuckDuckGoSearchResul
 
 from langchain_core.messages import AIMessage, HumanMessage
 
+from langchain_community.callbacks.manager import get_openai_callback
+
+# Handle token cost
+from langchain_community.callbacks.openai_info import get_openai_token_cost_for_model
+from langchain.callbacks.base import AsyncCallbackHandler
+import tiktoken
+
 from .vectorize import open_faiss_index
 from ..models import Message
 
@@ -55,6 +62,33 @@ tools = [
 
 prompt = hub.pull("hwchase17/structured-chat-agent")
 
+# Changes to AgentExecutors to enable token-by-token streaming broke
+# get_openai_callback(). Borrowing a workaround from
+# https://github.com/langchain-ai/langchain/issues/16798 until there is a fix.
+# TODO: check for bug fixes there.
+# use get_openai_token_cost_for_model to calculate cost
+class OpenAITokenAsyncHandler(AsyncCallbackHandler):
+    async def on_llm_start(
+        self,
+        # serialized: dict[str, Any],
+        serialized,
+        prompts: list[str],
+        # **kwargs: Any,
+        **kwargs,
+    ) -> None:
+        encoding = tiktoken.get_encoding("cl100k_base")
+        prompts_string = ''.join(prompts)
+        num_tokens = len(encoding.encode(prompts_string))
+        print("NUM TOKENS: ", num_tokens)
+
+
+    async def on_llm_end(self, response, **kwargs) -> None:
+        """Run when chain ends running."""
+        text_response = response.generations[0][0].text
+        encoding = tiktoken.get_encoding("cl100k_base")
+        response_string = len(encoding.encode(text_response))
+        print("NUM TOKENS RESPONSE: ", response_string)
+
 def load_chats(chat_id):
     messages = Message.objects.filter(chat_id=chat_id).order_by('created')
     return list(messages)
@@ -62,10 +96,17 @@ def load_chats(chat_id):
 def init_agent(chat_id):
     with open("base/services/openai_api_key.txt", "r") as file:
         key = file.read().strip()
-    chat = ChatOpenAI(api_key=key, temperature=0.5)
+    chat = ChatOpenAI(api_key=key,
+                      temperature=0.5,
+                      callbacks=[OpenAITokenAsyncHandler()]
+                      )
 
     agent = create_structured_chat_agent(llm=chat, tools=tools, prompt=prompt)
-    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    agent_executor = AgentExecutor.from_agent_and_tools(agent=agent,
+                                                        tools=tools,
+                                                        verbose=True,
+                                                        handle_parsing_errors=True)
+    agent_executor.max_execution_time = 15
     
     memory = ChatMessageHistory(session_id="test-session")
     chats = load_chats(chat_id)
@@ -82,8 +123,8 @@ def init_agent(chat_id):
 
     return agent_with_chat_history
 
-def get_agent_output(agent, human_message, chat_id):
-    result = agent.invoke(
+async def get_agent_output(agent, human_message, chat_id):
+    agent_response = await agent.ainvoke(
         {"input": human_message},
         config={
             "configurable": {
@@ -92,4 +133,4 @@ def get_agent_output(agent, human_message, chat_id):
         }
     )
 
-    return result
+    return agent_response

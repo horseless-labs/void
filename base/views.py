@@ -1,5 +1,6 @@
 from datetime import datetime
 import json, os
+import asyncio
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -266,7 +267,9 @@ def chatSendMessage(request, chat_id):
 def chatSendResponse(request, chat_id):
     message = request.session["mr_human_message"]
     agent = agent_spec.init_agent(chat_id)
-    agent_message = agent_spec.get_agent_output(agent, message, chat_id)
+    # agent_message = await agent_spec.get_agent_output(agent, message, chat_id)
+    agent_message = asyncio.run(agent_spec.get_agent_output(agent, message, chat_id))
+    print(agent_message)
 
     user = User.objects.get(username=request.user)
 
