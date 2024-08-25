@@ -20,6 +20,8 @@ from langchain_community.callbacks.openai_info import get_openai_token_cost_for_
 from langchain.callbacks.base import AsyncCallbackHandler
 import tiktoken
 
+from typing import List, Any, Dict
+
 from .vectorize import open_faiss_index
 from ..models import Message
 
@@ -70,11 +72,11 @@ prompt = hub.pull("hwchase17/structured-chat-agent")
 class OpenAITokenAsyncHandler(AsyncCallbackHandler):
     async def on_llm_start(
         self,
-        # serialized: dict[str, Any],
-        serialized,
-        prompts: list[str],
-        # **kwargs: Any,
-        **kwargs,
+        serialized: Dict[str, Any],
+        # serialized,
+        prompts: List[str],
+        **kwargs: Any,
+        # **kwargs,
     ) -> None:
         encoding = tiktoken.get_encoding("cl100k_base")
         prompts_string = ''.join(prompts)
