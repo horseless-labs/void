@@ -14,6 +14,10 @@ indices/
 media/
 staticfiles/
 
+# Files for language testing
+*.csv
+*.zip
+
 # Misc
 *.sw*
 *.txt
