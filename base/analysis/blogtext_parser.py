@@ -2,6 +2,7 @@
 # https://www.kaggle.com/datasets/rtatman/blog-authorship-corpus?resource=download
 
 import pandas as pd
+import random
 
 df = pd.read_csv("blog_archive/blogtext.csv")
 
@@ -18,7 +19,19 @@ def get_row_by_id(row_id):
     
     return row
 
+def get_row_by_index(idx):
+    if idx < 0 or idx >= len(df):
+        return f"Position {idx} is out of range"
+    
+    row = df.iloc[idx]
+    return row
+
+def get_random_posts():
+    idx = random.choice(df.index)
+    return df.loc[idx]
+
 if __name__ == '__main__':
-    row_id = 2059027
-    result = get_row_by_id(row_id)
-    print(result)
+    result = get_row_by_index(22)
+    result_id = result.id
+    posts = get_row_by_id(result_id)
+    print(posts)
