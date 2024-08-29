@@ -73,10 +73,8 @@ class OpenAITokenAsyncHandler(AsyncCallbackHandler):
     async def on_llm_start(
         self,
         serialized: Dict[str, Any],
-        # serialized,
         prompts: List[str],
         **kwargs: Any,
-        # **kwargs,
     ) -> None:
         encoding = tiktoken.get_encoding("cl100k_base")
         prompts_string = ''.join(prompts)
