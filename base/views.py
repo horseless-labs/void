@@ -12,6 +12,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now
@@ -100,6 +103,22 @@ def journal(request, username):
     conversation.initialize_chat(username=username)
     context = {"chat_id": conversation.chat_id}
     return render(request, "base/journal.html", context=context)
+
+@login_required(login_url='login')
+def uploadJournal(request):
+    if request.method == 'POST':
+        uploaded_file = request.FILES.get('text_file')
+        if uploaded_file:
+            file_content = uploaded_file.read().decode('utf-8')
+
+            file_name = default_storage.save(uploaded_file.name, ContentFile(file_content))
+
+            user = request.user
+            # conversation = Conversation.objects.create(user=user)
+            # conversation.initialize_chat(username=user.username)
+
+            return HttpResponse(f"File uploaded successfully!<br>Content</br><pre>{file_content}</pre")
+    return render(request, "base/journal_upload.html")
 
 @csrf_exempt
 def sendJournal(request, chat_id):

@@ -15,6 +15,7 @@ urlpatterns = [
     path('journal/<str:username>', views.journal, name='journal'),
     path('send-journal-entry/<str:chat_id>', views.sendJournal, name="send-journal-entry"),
     path('redirect-journal/<str:chat_id>', views.redirectJournalOrChatManager, name='redirect-journal'),
+    path('upload-text-file/', views.uploadJournal, name='upload-text-file'),
 
     path('chat-manager/<str:username>', views.chatManager, name="chat-manager"),
     path('create-new-chat/<str:username>', views.createNewChat, name="create-new-chat"),
