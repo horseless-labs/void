@@ -37,19 +37,29 @@ class Conversation(models.Model):
     # instead of having it automatically generated.
     # This is made for experimental work with old blogs
     # TODO: iterate when there are customers that actually want this feature.
-    def initialize_journal_entry(self, datetime, content=None, username=None):
+    def initialize_journal_entry(self, datetime, content, username, chat_id):
         self.base_messages = chat_session.initialize_chat_session()
+        self.chat_id = chat_id
         self.save()
 
         user = User.objects.get(username=username)
         
-        message = Message.objects.create(
-            user=user,
-            chat_id=self.chat_id,
-            role="user",
-            body=content,
-        )
-        message.save()
+        for message_data in self.base_messages:
+            role = message_data["role"]
+            content = message_data["content"]
+
+            user = None
+            if role == "user":
+                user = User.objects.get(username=username)
+            
+            message = Message.objects.create(
+                user=user,
+                # conversation=self,
+                chat_id=self.chat_id,
+                role=role,
+                body=content
+            )
+            message.save()
 
     def save(self, *args, **kwargs):
         if not self.chat_id:

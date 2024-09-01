@@ -126,18 +126,18 @@ def uploadJournal(request, username):
                 chat_id = chat_session.generate_chat_id()
                 # conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
                 conversation = Conversation.objects.create(user=user)
-                conversation.initialize_journal_entry(datetime=entry[0], content=entry[1], username=username)
+                conversation.initialize_journal_entry(datetime=entry[0], content=entry[1], username=username, chat_id=chat_id)
                 conversation.save()
 
-                # message = Message.objects.create(
-                #     user=user,
-                #     # In this implementation, a journal entry also has a unique chat id
-                #     # This will make it visible in the Chat Manager
-                #     chat_id=chat_id,
-                #     role="user",
-                #     body=entry[1],
-                # )
-                # message.save()
+                message = Message.objects.create(
+                    user=user,
+                    # In this implementation, a journal entry also has a unique chat id
+                    # This will make it visible in the Chat Manager
+                    chat_id=chat_id,
+                    role="user",
+                    body=entry[1],
+                )
+                message.save()
 
             return redirect("chat-manager", username=username)
     return render(request, "base/journal_upload.html", context=context)
@@ -236,6 +236,15 @@ def chat(request, chat_id):
         return render(request, "base/403.html")
 
     messages = Message.objects.filter(chat_id=chat_id).order_by('created')
+    for message in messages:
+        print(f"ID: {message.id}")
+        print(f"User: {message.user}")
+        print(f"Role: {message.get_role_display()}")  # Uses choices to display the human-readable role
+        print(f"Chat ID: {message.chat_id}")
+        print(f"Body: {message.body}")
+        print(f"Created: {message.created}")
+        print(f"Updated: {message.updated}")
+        print("-" * 40)  # Separator for readability
 
     context = {"username": request.user.username,
                "conversation": conversation,
