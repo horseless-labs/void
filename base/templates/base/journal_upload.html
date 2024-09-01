@@ -10,7 +10,7 @@
     <h2>Upload Text File</h2>
 
     <!-- File upload form -->
-    <form id="upload-form" method="post" enctype="multipart/form-data" action="{% url 'upload-text-file' %}">
+    <form id="upload-form" method="post" enctype="multipart/form-data" action="{% url 'upload-text-file' username=username %}">
         {% csrf_token %}
         <input type="file" name="text_file" id="file-input" accept=".txt" />
         <button type="submit" id="upload-btn">Upload</button>

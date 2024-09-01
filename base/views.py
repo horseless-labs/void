@@ -24,6 +24,7 @@ from django.http import HttpResponse
 from .forms import UserForm
 from .services import agent_spec, vectorize, chat_session
 from .models import Message, Conversation
+from .analysis import partition_blogs as pb
 
 def home(request):
     user = request.user
@@ -105,20 +106,41 @@ def journal(request, username):
     return render(request, "base/journal.html", context=context)
 
 @login_required(login_url='login')
-def uploadJournal(request):
+def uploadJournal(request, username):
+    context = {"username": username}
+
     if request.method == 'POST':
         uploaded_file = request.FILES.get('text_file')
         if uploaded_file:
             file_content = uploaded_file.read().decode('utf-8')
+            entries = pb.read_journal_string(file_content)
+            print(entries[0])
 
-            file_name = default_storage.save(uploaded_file.name, ContentFile(file_content))
+            # file_name = default_storage.save(uploaded_file.name, ContentFile(file_content))
 
-            user = request.user
-            # conversation = Conversation.objects.create(user=user)
-            # conversation.initialize_chat(username=user.username)
+            # user = request.user
+            for entry in entries:
+                user = User.objects.get(username=username)
+                print(user)
+                # Currently, every one of these journal entries gets their own Conversation.
+                chat_id = chat_session.generate_chat_id()
+                # conversation, created = Conversation.objects.get_or_create(chat_id=chat_id)
+                conversation = Conversation.objects.create(user=user)
+                conversation.initialize_journal_entry(datetime=entry[0], content=entry[1], username=username)
+                conversation.save()
 
-            return HttpResponse(f"File uploaded successfully!<br>Content</br><pre>{file_content}</pre")
-    return render(request, "base/journal_upload.html")
+                # message = Message.objects.create(
+                #     user=user,
+                #     # In this implementation, a journal entry also has a unique chat id
+                #     # This will make it visible in the Chat Manager
+                #     chat_id=chat_id,
+                #     role="user",
+                #     body=entry[1],
+                # )
+                # message.save()
+
+            return redirect("chat-manager", username=username)
+    return render(request, "base/journal_upload.html", context=context)
 
 @csrf_exempt
 def sendJournal(request, chat_id):
@@ -203,6 +225,10 @@ def sendFaissResponse(request, username):
 @login_required(login_url='login')
 def chat(request, chat_id):
     conversation = Conversation.objects.get(chat_id=chat_id)
+    print(chat_id)
+    print(conversation)
+    print(conversation.user)
+    print(request.user.username)
 
     if conversation.user.username != request.user.username:
         print(conversation.user_id)

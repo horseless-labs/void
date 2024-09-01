@@ -12,10 +12,6 @@ class Conversation(models.Model):
 
     def initialize_chat(self, username=None, chat_id=None):
         self.base_messages = chat_session.initialize_chat_session()
-        # if chat_id == None:
-        #     self.chat_id = chat_session.generate_chat_id()
-        # else:
-        #     self.chat_id = chat_id
         self.chat_id = chat_session.generate_chat_id()
 
         self.save()
@@ -36,6 +32,24 @@ class Conversation(models.Model):
                 body=content
             )
             message.save()
+
+    # Distinct from initialize_chat by addition of a provided "created datetime"
+    # instead of having it automatically generated.
+    # This is made for experimental work with old blogs
+    # TODO: iterate when there are customers that actually want this feature.
+    def initialize_journal_entry(self, datetime, content=None, username=None):
+        self.base_messages = chat_session.initialize_chat_session()
+        self.save()
+
+        user = User.objects.get(username=username)
+        
+        message = Message.objects.create(
+            user=user,
+            chat_id=self.chat_id,
+            role="user",
+            body=content,
+        )
+        message.save()
 
     def save(self, *args, **kwargs):
         if not self.chat_id:
