@@ -1,6 +1,8 @@
 import sys
 import tiktoken
 
+# Currently only useful for estimating the cost of tokenizing a single block
+# of text. Unsure of how this will work with agent Thoughts and Actions.
 def estimate_tokens(text, model="gpt-3.5-turbo", cost_per_megatoken=1.50):
     tokenizer = tiktoken.encoding_for_model(model)
 

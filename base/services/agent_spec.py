@@ -77,17 +77,23 @@ class OpenAITokenAsyncHandler(AsyncCallbackHandler):
         **kwargs: Any,
     ) -> None:
         encoding = tiktoken.get_encoding("cl100k_base")
+        self.cost_per_megatoken = 1.50
         prompts_string = ''.join(prompts)
         self.num_tokens = len(encoding.encode(prompts_string))
-        print("NUM TOKENS: ", self.num_tokens)
-
+        self.cost = (self.num_tokens / 1000000) * self.cost_per_megatoken
+        print(f"Number of tokens: {self.num_tokens}")
+        print(f"Cost: ${self.cost}")
 
     async def on_llm_end(self, response, **kwargs) -> None:
         """Run when chain ends running."""
         text_response = response.generations[0][0].text
         encoding = tiktoken.get_encoding("cl100k_base")
         self.response_string = len(encoding.encode(text_response))
-        print("NUM TOKENS RESPONSE: ", self.response_string)
+        self.cost = (self.num_tokens / 1000000) * self.cost_per_megatoken
+
+        print(f"Number of response tokens: ", self.response_string)
+        print(f"Response cost: ${self.cost}")
+
 
     def get_tokens_info(self):
         return self.num_tokens, self.response_string
