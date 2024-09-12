@@ -5,7 +5,7 @@
 __pycache__/
 
 # Database
-db.sqlite3
+*.sqlite3
 *.db
 *faiss_index
 indices/
@@ -21,3 +21,4 @@ staticfiles/
 # Misc
 *.sw*
 *.txt
+migrations_backup/
