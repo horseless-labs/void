@@ -74,6 +74,12 @@ def registerPage(request):
     context = {"form": form}
     return render(request, "base/login_register.html", context)
 
+@login_required(login_url='login')
+def userProfile(request, username):
+    user = User.objects.get(username=username)
+    context = {"user": user}
+    return render(request, "base/profile.html", context=context)
+
 # TODO: test this later, as it is currently unconnected to anything.
 @login_required(login_url='login')
 def updateUser(request):
@@ -84,7 +90,7 @@ def updateUser(request):
         form = UserForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect("user-profile", pk=user.id)
+            return redirect("user-profile", username=user.username)
     
     return render(request, "base/update_user.html", {"form": form})
 
