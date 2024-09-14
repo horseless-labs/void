@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from . import views
 
@@ -24,4 +26,4 @@ urlpatterns = [
     path('ask/<str:username>', views.ask, name='ask'),
     path('send-faiss-query/<str:username>', views.sendFaissQuery, name="send-faiss-query"),
     path('send-faiss-response/<str:username>', views.sendFaissResponse, name="send-faiss-response")
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

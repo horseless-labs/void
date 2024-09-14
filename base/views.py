@@ -91,7 +91,7 @@ def updateUser(request):
         if form.is_valid():
             form.save()
             return redirect("user-profile", username=user.username)
-    
+    print(form)
     return render(request, "base/update_user.html", {"form": form})
 
 @login_required(login_url='login')
