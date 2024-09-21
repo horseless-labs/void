@@ -13,6 +13,8 @@ indices/
 # Media and static files
 media/
 staticfiles/
+dennis_uZpzeda.jpg
+profile_photo.jpg
 
 # Files for language testing
 *.csv
