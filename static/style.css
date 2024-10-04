@@ -292,3 +292,21 @@ form button:hover {
 #submit-btn:hover {
     background-color: #0056b3;
 }
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"] {
+    border-color: #007BFF;
+    outline: none;
+}
