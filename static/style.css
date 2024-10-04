@@ -328,3 +328,79 @@ input[type="email"] {
     border-color: #007BFF;
     outline: none;
 }
+
+/* Main container for sidebar content */
+.main-container {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Sidebar styling */
+
+.sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+.chat-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chat-list li {
+    margin-bottom: 10px;
+}
+
+.chat-list a {
+    text-decoration: 10px;
+    color: #007bff;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.chat-list a:hover {
+    color: #0056b3;
+}
+
+/* Content area styling  */
+.content-area {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button container styling */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}

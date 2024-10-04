@@ -1,38 +1,45 @@
 {% extends "main.html" %}
 
 {% block content %}
-<div class="manage-chats-container">
-    <ul>
-        {% for chat_id in chat_ids %}
-            <li><a href="{% url 'chat' chat_id=chat_id %}">{{ chat_id }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
+<div class="main-container">
+    <!-- Sidebar for managing chats -->
+    <div class="sidebar">
+        <h3>Chats</h3>
+        <ul class="chat-list">
+            {% for chat_id in chat_ids %}
+                <li><a href="{% url 'chat' chat_id=chat_id %}">{{ chat_id }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
 
-<div class="button-container">
-    <form method="post" action="{% url 'create-new-chat' username=user.username %}">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value="{{ user.id }}">
-        <input type="hidden" name="username" value="{{ user.username }}">
-        <button type="submit" class="btn btn-primary">New Chat</button>
-    </form>
-    <form method="post" action="{% url 'journal' username=user.username %}">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value="{{ user.id }}">
-        <input type="hidden" name="username" value="{{ user.username }}">
-        <button type="submit" class="btn btn-primary">New Journal</button>
-    </form>
-    <form method="post" action="{% url 'upload-text-file' username=user.username %}">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value="{{ user.id }}">
-        <input type="hidden" name="username" value="{{ user.username }}">
-        <button type="submit" class="btn btn-primary">Upload Journal .txt</button>
-    </form>
-    <form method="post" action="{% url 'ask' username=user.username %}">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value="{{ user.id }}">
-        <input type="hidden" name="username" value="{{ user.username }}">
-        <button type="submit" class="btn btn-primary">Query Your History</button>
-    </form>
+    <!-- Main content area -->
+    <div class="content-area">
+        <div class="button-container">
+            <form method="post" action="{% url 'create-new-chat' username=user.username %}">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <button type="submit" class="btn btn-primary">New Chat</button>
+            </form>
+            <form method="post" action="{% url 'journal' username=user.username %}">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <button type="submit" class="btn btn-primary">New Journal</button>
+            </form>
+            <form method="post" action="{% url 'upload-text-file' username=user.username %}">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <button type="submit" class="btn btn-primary">Upload Journal .txt</button>
+            </form>
+            <form method="post" action="{% url 'ask' username=user.username %}">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <button type="submit" class="btn btn-primary">Query Your History</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
