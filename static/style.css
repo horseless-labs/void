@@ -263,6 +263,7 @@ form button:hover {
     margin-bottom: 20px;
     font-size: 1.1em;
     line-height: 1.5;
+    box-sizing: border-box;
     resize: vertical;
 }
 
