@@ -15,7 +15,7 @@
 
             <form class="form" action="" method="POST">
               {% csrf_token %}
-              <div class="form__group form__group">
+              <div class="form__group">
                 <label for="room_name">Username</label>
                 <input id="username" name="username" type="text" placeholder="e.g. ben_franklin" />
               </div>
@@ -72,7 +72,7 @@
               {% csrf_token %}
 
               {% for field in form %}
-              <div class="form__group form__group">
+              <div class="form__group">
                 <label for="room_name">{{field.label}}</label>
                 {{field}}
               </div>
