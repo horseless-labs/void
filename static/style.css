@@ -374,20 +374,47 @@ input[type="email"] {
     color: #0056b3;
 }
 
+.chat-link {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* truncate text with ellipses */
+    max-width: 200px;
+}
+
 /* Content area styling  */
-.content-area {
+/* .content-area {
     flex: 1;
     background-color: #ffffff;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} */
+
+.center-content {
+    margin-left: 280px;
+    margin-bottom: 60px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
 }
 
 /* Button container styling */
 .button-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    padding: 15px;
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    justify-content: space-around;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn {
@@ -399,6 +426,8 @@ input[type="email"] {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    flex-grow: 1; /* button take equal space */
+    margin: 0 10px; /* horizontal spacing */
 }
 
 .btn:hover {
