@@ -332,20 +332,26 @@ input[type="email"] {
 /* Main container for sidebar content */
 .main-container {
     display: flex;
+    flex-direction: row; /* Arragne sidebar and content area side-by-side */
     gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    min-height: calc(100vh - 80px); /* Adjust for the height of the button container */
+    box-sizing: border-box;
 }
 
 /* Sidebar styling */
-
 .sidebar {
-    width: 250px;
+    /* width: 250px; */
+    width: 20%;
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: sticky; /* Keep the sidebar at the top */
+    top: 0;
+    bottom: 80px; /* Leave space for button container */
+    overflow-y: auto; /* Add scrolling if the content is too long */
 }
 
 .sidebar h3 {
@@ -386,15 +392,8 @@ input[type="email"] {
 }
 
 /* Content area styling  */
-/* .content-area {
-    flex: 1;
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-} */
-
 .center-content {
+    width: 80%;
     margin-left: 280px;
     margin-bottom: 60px;
     padding: 20px;
@@ -428,6 +427,23 @@ input[type="email"] {
     transition: background-color 0.3s ease;
     flex-grow: 1; /* button take equal space */
     margin: 0 10px; /* horizontal spacing */
+}
+
+/* Screen exceeds a certain width */
+@media (min-width: 1200px) {
+    .button-container {
+        right: 20px;
+        bottom: 20px;
+        width: auto;
+        background-color: transparent;
+        box-shadow: none;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .button-container form {
+        margin-left: 10px;
+    }
 }
 
 .btn:hover {
