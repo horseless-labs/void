@@ -334,7 +334,8 @@ input[type="email"] {
     display: flex;
     flex-direction: row; /* Arragne sidebar and content area side-by-side */
     gap: 20px;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
     min-height: calc(100vh - 80px); /* Adjust for the height of the button container */
     box-sizing: border-box;
@@ -343,7 +344,7 @@ input[type="email"] {
 /* Sidebar styling */
 .sidebar {
     /* width: 250px; */
-    width: 20%;
+    width: 30%;
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 20px;
@@ -370,7 +371,7 @@ input[type="email"] {
 }
 
 .chat-list a {
-    text-decoration: 10px;
+    text-decoration: none;
     color: #007bff;
     font-weight: bold;
     transition: color 0.3s ease;
@@ -393,8 +394,8 @@ input[type="email"] {
 
 /* Content area styling  */
 .center-content {
-    width: 80%;
-    margin-left: 280px;
+    /* width: 80%; */
+    margin-left: 1px;
     margin-bottom: 60px;
     padding: 20px;
     background-color: #ffffff;
