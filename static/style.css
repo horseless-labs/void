@@ -1,56 +1,4 @@
-/* General Styles */
-/* General link styling */
-a {
-    text-decoration: none; /* Remove default underline */
-    color: #007BFF; /* Primary link color */
-    font-weight: normal; /* Adjust as needed */
-    transition: color 0.3s ease, background-color 0.3s ease; /* Smooth transition for hover effects */
-}
-
-/* Link hover state */
-a:hover, a:focus {
-    color: #0056b3; /* Darker color for hover/focus */
-    text-decoration: underline; /* Underline on hover for emphasis */
-    background-color: #e9ecef; /* Light background color on hover (optional) */
-}
-
-/* Link active state (when clicked) */
-a:active {
-    color: #003d7a; /* Even darker color when the link is being clicked */
-    background-color: #d6d6d6; /* Darker background color when active (optional) */
-}
-
-/* Visited link state */
-a:visited {
-    color: #6c757d; /* Color for visited links (optional) */
-}
-
-/* Styling for links in a navbar or menu */
-.navbar a {
-    color: #ffffff; /* Link color for navbar */
-}
-
-.navbar a:hover, .navbar a:focus {
-    color: #ffc107; /* Highlight color on hover for navbar links */
-}
-
-/* Styling for links in buttons */
-.button-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007BFF; /* Background color of the button */
-    color: #ffffff; /* Text color of the button */
-    border-radius: 5px; /* Rounded corners */
-    text-align: center;
-    text-decoration: none; /* Remove underline */
-    font-weight: bold; /* Make text bold */
-}
-
-.button-link:hover, .button-link:focus {
-    background-color: #0056b3; /* Darker background on hover */
-    color: #ffffff; /* Keep text color the same */
-}
-
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -63,6 +11,43 @@ body {
     width: 80%;
     margin: 0 auto;
     padding: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: #007BFF;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+a:hover, a:focus {
+    color: #0056b3;
+    text-decoration: underline;
+    background-color: #e9ecef;
+}
+
+a:active {
+    color: #003d7a;
+    background-color: #d6d6d6;
+}
+
+a:visited {
+    color: #6c757d;
+}
+
+/* Button Styles */
+.button-link, form button, #message-form button, #submit-btn, .btn--main, .btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.button-link:hover, .button-link:focus, form button:hover, #message-form button:hover, #submit-btn:hover, .btn--main:hover, .btn:hover {
+    background-color: #0056b3;
 }
 
 /* Header Styles */
@@ -106,6 +91,16 @@ body {
     font-size: 1em;
 }
 
+/* Navbar Link Styles */
+.navbar a {
+    color: #ffffff;
+}
+
+.navbar a:hover, .navbar a:focus {
+    color: #ffc107;
+}
+
+/* Dropdown Menu Styles */
 .dropdown-button {
     background: none;
     border: none;
@@ -142,79 +137,41 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.home-container p {
-    margin-bottom: 20px;
-}
-
-form button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-form button:hover {
-    background-color: #0056b3;
-}
-
-/* General Styles for the Chat Form */
+/* Chat Form Styles */
 #chat-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    max-width: 800px; /* Set a max width for the chat container */
-    margin: 0 auto; /* Center the entire chat container */
-    padding: 20px; /* Add some padding around the chat area */
-    background-color: #fff; /* Set a background color */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
-    border-radius: 10px; /* Optional: Round the corners */
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 #message-form {
-    display: flex; /* Align input and button in a row */
-    align-items: center; /* Vertically center align input and button */
-    gap: 10px; /* Add some space between the input and the button */
-    margin-top: 20px; /* Optional: Add some space above the form */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-/* Input Field Styling */
 #message-input {
-    flex: 1; /* Allow the input field to take up the remaining space */
-    padding: 10px; /* Padding inside the input field */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 1em; /* Text size */
-    box-sizing: border-box; /* Ensure padding is included in the width calculation */
-}
-
-/* Button Styling */
-#message-form button {
-    background-color: #007bff; /* Primary button color */
-    color: #fff; /* Button text color */
-    border: none; /* Remove default border */
-    padding: 10px 20px; /* Button padding */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 1em; /* Font size */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-}
-
-/* Button Hover Effect */
-#message-form button:hover {
-    background-color: #0056b3; /* Darker button color on hover */
-    margin-top: auto;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
 }
 
 #messages {
-    height: 600px; /* Adjust height as needed */
+    height: 600px;
     overflow-y: auto;
 }
 
-.message-user,
-.message-computer {
+.message-user, .message-computer {
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -267,54 +224,8 @@ form button:hover {
     resize: vertical;
 }
 
-/* Styling for the button container */
-.button-container {
-    display: flex; /* Use flexbox to arrange items in a row */
-    gap: 10px; /* Add space between buttons (adjust as needed) */
-    margin-bottom: 20px; /* Optional: Add some space below the container */
-    margin: 0 auto;
-}
-
-/* Ensure form elements do not stretch */
-.button-container form {
-    margin: 0; /* Remove default margin from forms */
-}
-
-/* Might remove these in favor of a single consistent button */
-#submit-btn {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-#submit-btn:hover {
-    background-color: #0056b3;
-}
-
-/* Consistent button */
-.btn--main {
-    width: auto;
-    background-color: #007bff;
-    color: #fff;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
-}
-
-.btn--main:hover {
-    background-color: #0056b3;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"] {
+/* Input Field Styles */
+input[type="text"], input[type="password"], input[type="email"], textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
@@ -323,37 +234,32 @@ input[type="email"] {
     font-size: 1em;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"] {
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, textarea:focus {
     border-color: #007BFF;
     outline: none;
 }
 
-/* Main container for sidebar content */
+/* Main Layout Styles */
 .main-container {
     display: flex;
-    flex-direction: row; /* Arragne sidebar and content area side-by-side */
     gap: 20px;
     width: 100%;
-    max-width: 100%;
     margin: 0 auto;
-    min-height: calc(100vh - 80px); /* Adjust for the height of the button container */
+    min-height: calc(100vh - 80px);
     box-sizing: border-box;
 }
 
-/* Sidebar styling */
+/* Sidebar Styles */
 .sidebar {
-    /* width: 250px; */
     width: 30%;
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: sticky; /* Keep the sidebar at the top */
+    position: sticky;
     top: 0;
-    bottom: 80px; /* Leave space for button container */
-    overflow-y: auto; /* Add scrolling if the content is too long */
+    bottom: 80px;
+    overflow-y: auto;
 }
 
 .sidebar h3 {
@@ -371,17 +277,6 @@ input[type="email"] {
     margin-bottom: 10px;
 }
 
-.chat-list a {
-    text-decoration: none;
-    color: #007bff;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-.chat-list a:hover {
-    color: #0056b3;
-}
-
 .chat-link {
     text-decoration: none;
     color: #007bff;
@@ -389,13 +284,16 @@ input[type="email"] {
     display: block;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis; /* truncate text with ellipses */
+    text-overflow: ellipsis;
     max-width: 200px;
 }
 
-/* Content area styling  */
+.chat-link:hover {
+    color: #0056b3;
+}
+
+/* Content Area Styles */
 .center-content {
-    /* width: 80%; */
     margin-left: 1px;
     margin-bottom: 60px;
     padding: 20px;
@@ -405,7 +303,7 @@ input[type="email"] {
     flex-grow: 1;
 }
 
-/* Button container styling */
+/* Button Container Styles */
 .button-container {
     position: fixed;
     bottom: 0;
@@ -418,20 +316,23 @@ input[type="email"] {
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    flex-grow: 1; /* button take equal space */
-    margin: 0 10px; /* horizontal spacing */
+/* Form Group and Action Styles */
+.form__group {
+    margin-bottom: 20px;
 }
 
-/* Screen exceeds a certain width */
+.form__action {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+}
+
+/* Responsive Styles */
 @media (min-width: 1200px) {
     .button-container {
         right: 20px;
@@ -446,40 +347,4 @@ input[type="email"] {
     .button-container form {
         margin-left: 10px;
     }
-}
-
-.btn:hover {
-    background-color: #0056b3;
-}
-
-.form__group {
-    margin-bottom: 20px;
-}
-
-.form__action {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-}
-
-textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 1em;
-    font-size: 1em;
-    box-sizing: border-box;
-    resize: vertical;
-}
-
-.form__action {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
 }
