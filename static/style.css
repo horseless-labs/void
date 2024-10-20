@@ -333,21 +333,30 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
 }
 
 /* Responsive Styles */
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .main-container {
         flex-direction: row;
     }
 
-    /* .sidebar {
+    .sidebar {
         width: 30%;
         margin-bottom: 0;
         position: sticky;
         top: 0;
         bottom: 80px;
-    } */
-     .sidebar {
+    }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+    .sidebar {
         display: none;
-     }
+    }
+}
+
+@media (orientation: landscape) {
+    .sidebar {
+        display: block;
+    }
 }
 
 @media (min-width: 1200px) {
@@ -363,5 +372,13 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
 
     .button-container form {
         margin-left: 10px;
+    }
+
+    .sidebar {
+        width: 30%;
+        margin-bottom: 0;
+        position: sticky;
+        top: 0;
+        bottom: 80px;
     }
 }
