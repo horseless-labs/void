@@ -351,6 +351,24 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
     .sidebar {
         display: none;
     }
+
+    #message-input, #message-form button {
+        padding: 10px;
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+
+    #message-form {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background-color: #f8f9fa;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        margin: 0;
+    }
 }
 
 @media (orientation: landscape) {
