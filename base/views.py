@@ -15,7 +15,7 @@ from django.utils.timezone import now
 
 from .forms import UserForm, MyUserCreationForm
 from .services import agent_spec, vectorize, chat_session
-from .models import Message, Conversation, User
+from .models import Message, Conversation, User, TokenUsage
 from .analysis import partition_blogs as pb
 
 def home(request):
@@ -324,6 +324,7 @@ def chatSendResponse(request, chat_id):
     # agent_message = await agent_spec.get_agent_output(agent, message, chat_id)
     agent_message = asyncio.run(agent_spec.get_agent_output(agent, message, chat_id))
     print(f"tt_cb from chatSendResponse(): {tt_cb.get_tokens_info()}")
+    tokens_used, response_tokens, cost = tt_cb.get_tokens_info()
 
     user = User.objects.get(username=request.user)
 
@@ -335,6 +336,15 @@ def chatSendResponse(request, chat_id):
     )
 
     message.save()
+
+    tokens = TokenUsage.objects.create(
+        user=user,
+        conversation=Conversation.objects.get(chat_id=chat_id),
+        tokens_used=tokens_used,
+        # response_tokens=response_tokens,
+        total_cost=cost
+    )
+    tokens.save()
 
     try:
         faiss_index = f"base/indices/{request.user.username}_faiss_index"

@@ -96,7 +96,7 @@ class OpenAITokenAsyncHandler(AsyncCallbackHandler):
 
 
     def get_tokens_info(self):
-        return self.num_tokens, self.response_string
+        return self.num_tokens, self.response_string, self.cost
 
 def load_chats(chat_id):
     messages = Message.objects.filter(chat_id=chat_id).order_by('created')
