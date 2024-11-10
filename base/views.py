@@ -2,6 +2,7 @@ import asyncio
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db import models
 
 # Authentication imports
 from django.contrib.auth import authenticate, login, logout
@@ -319,6 +320,18 @@ def chatSendMessage(request, chat_id):
 # Handles the agent's reply
 @csrf_exempt
 def chatSendResponse(request, chat_id):
+    # Check the user's total spending
+    # NOTE: this is implemented in this way because this is a demonstration; a recruiter shouldn't
+    #       use too many tokens.
+    # NOTE: this could be fleshed out to manage users to e.g. better manage large numbers of users,
+    #       help prevent the formation of parasocial relationships, etc.
+    # TODO: expand this in monetized production
+    user = User.objects.get(username=request.user)
+    total_spent = TokenUsage.objects.filter(user=user).aggregate(models.Sum('total_cost'))['total_cost__sum'] or 0
+
+    if total_spent >= 0.01:
+        return JsonResponse({"error": "Token usage limit exceeded"}, status=401)
+    
     message = request.session["mr_human_message"]
     agent, tt_cb = agent_spec.init_agent(chat_id)
     # agent_message = await agent_spec.get_agent_output(agent, message, chat_id)
