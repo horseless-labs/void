@@ -374,3 +374,6 @@ def chatSendResponse(request, chat_id):
     }
     
     return JsonResponse(response_data)
+
+def recruiterView(request):
+    return render(request, "base/recruiters.html")

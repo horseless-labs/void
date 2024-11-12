@@ -24,3 +24,4 @@ profile_photo.jpg
 *.sw*
 *.txt
 migrations_backup/
+*recruiters.html

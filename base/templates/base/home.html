@@ -2,20 +2,11 @@
 
 {% block content %}
 <div class="home-container">
-    <p>
-        In today's fast-paced world, finding someone to talk to about life's challenges and goals can be difficult. 
-        Our platform offers a unique solution: an AI-based friend and life coach that is available 24/7. 
-        This intelligent companion can provide advice, encouragement, and a listening ear, helping you navigate 
-        through personal and professional challenges. Whether you're looking for someone to help you set and achieve 
-        goals, or just need a friendly conversation, our AI is here to assist you every step of the way.
-    </p>
-    <p>
-        Our AI friend and life coach is designed to understand and respond to your needs with empathy and insight. 
-        Utilizing advanced language processing, the AI can converse naturally, offering guidance on a wide range of 
-        topics, from career advice to personal development. It learns from your interactions, tailoring its responses 
-        to better suit your personality and preferences. Join us today and experience a new way of receiving 
-        personalized support and companionship.
-    </p>
+    <p>Have you ever felt like the world is crashing down, leaving you wanting to scream into the Void? Here, the Void can finally scream back.</p>
+    
+    <p>This platform pushes the boundaries of AI. It uses a variety of models from OpenAI for conversations, and, more importantly, leverages retrieval-augmented generation (RAG). This means that anything you share here becomes part of your personal vector database, searchable and accessible for future interactions with the AI.</p>
+    
+    <p>We're building this vision of the future day by day, so <strong>everything is in flux and under construction</strong>. If you're interested in the more technical side of things, most of the code for the site is available at <a href="https://github.com/horseless-labs/void">this GitHub repo</a>!</p>      
 
     {% if request.user.is_authenticated %}
     <form method="post" action="{% url 'chat-manager' user_id=user.id %}">

@@ -25,5 +25,7 @@ urlpatterns = [
 
     path('ask/<str:username>', views.ask, name='ask'),
     path('send-faiss-query/<str:username>', views.sendFaissQuery, name="send-faiss-query"),
-    path('send-faiss-response/<str:username>', views.sendFaissResponse, name="send-faiss-response")
+    path('send-faiss-response/<str:username>', views.sendFaissResponse, name="send-faiss-response"),
+
+    path('recruiters/', views.recruiterView, name='recruiters')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
